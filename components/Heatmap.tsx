@@ -1,14 +1,16 @@
 import { View, StyleSheet } from "react-native";
 
-export function Heatmap({ data }: { data: number[] }) {
+export function Heatmap({ data }: { data?: number[] }) {
+  if (!Array.isArray(data)) return null;
+
   return (
     <View style={styles.grid}>
-      {data.map((count, i) => (
+      {data.map((v, i) => (
         <View
           key={i}
           style={[
             styles.cell,
-            { opacity: count === 0 ? 0.15 : Math.min(0.25 + count * 0.15, 1) },
+            { opacity: v === 0 ? 0.15 : 0.8 },
           ]}
         />
       ))}

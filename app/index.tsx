@@ -10,7 +10,6 @@ import { scheduleStreakWarning } from "../utils/notifications";
 
 export default function Home() {
   const { github, leetcode, loaded } = useUsernames();
-
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetcodeStreak(leetcode);
 
@@ -31,14 +30,18 @@ export default function Home() {
         streak={githubData.streak}
         loading={githubData.loading}
       />
-      <Heatmap data={githubData.heatmap} />
+      {!githubData.loading && (
+        <Heatmap data={githubData.heatmap} />
+      )}
 
       <StreakCard
         title="LeetCode Streak"
         streak={leetcodeData.streak}
         loading={leetcodeData.loading}
       />
-      <Heatmap data={leetcodeData.heatmap} />
+      {!leetcodeData.loading && (
+        <Heatmap data={leetcodeData.heatmap} />
+      )}
     </View>
   );
 }
@@ -52,6 +55,5 @@ const styles = StyleSheet.create({
   settings: {
     color: "#22c55e",
     marginBottom: 16,
-    fontSize: 16,
   },
 });

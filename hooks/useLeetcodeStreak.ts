@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 export function useLeetcodeStreak(username: string) {
   const [streak, setStreak] = useState(0);
@@ -14,41 +13,57 @@ export function useLeetcodeStreak(username: string) {
 
     async function fetchData() {
       try {
-        const res = await axios.get(
+        const res = await fetch(
           `https://leetcode-stats-api.herokuapp.com/${username}`
         );
+        const data = await res.json();
 
-        const calendar = res.data.submissionCalendar || {};
+        if (!data.submissionCalendar) {
+          setStreak(0);
+          setHeatmap([]);
+          return;
+        }
+
+        const calendar = data.submissionCalendar;
         const map = new Map<string, number>();
 
         Object.keys(calendar).forEach((ts) => {
           const day = new Date(Number(ts) * 1000)
             .toISOString()
-            .split("T")[0];
+            .slice(0, 10);
           map.set(day, calendar[ts]);
         });
 
-        const today = new Date();
+        let count = 0;
+        let cursor = new Date();
+
+        while (true) {
+          const key = cursor.toISOString().slice(0, 10);
+          if ((map.get(key) || 0) > 0) {
+            count++;
+            cursor.setDate(cursor.getDate() - 1);
+          } else {
+            break;
+          }
+        }
+
+        setStreak(count);
+
         const days: number[] = [];
+        const today = new Date();
 
         for (let i = 89; i >= 0; i--) {
           const d = new Date(today);
           d.setDate(today.getDate() - i);
-          const key = d.toISOString().split("T")[0];
+          const key = d.toISOString().slice(0, 10);
           days.push(map.get(key) || 0);
         }
 
         setHeatmap(days);
-
-        let count = 0;
-        for (let i = days.length - 1; i >= 0; i--) {
-          if (days[i] > 0) count++;
-          else break;
-        }
-
-        setStreak(count);
       } catch (e) {
-        console.error("LeetCode error:", e);
+        console.log("LeetCode error:", e);
+        setStreak(0);
+        setHeatmap([]);
       } finally {
         setLoading(false);
       }

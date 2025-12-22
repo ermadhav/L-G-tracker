@@ -15,8 +15,6 @@ export default function Settings() {
         value={github}
         onChangeText={setGithub}
         style={styles.input}
-        placeholder="cosmocoders"
-        placeholderTextColor="#777"
       />
 
       <Text style={styles.label}>LeetCode Username</Text>
@@ -24,8 +22,6 @@ export default function Settings() {
         value={leetcode}
         onChangeText={setLeetcode}
         style={styles.input}
-        placeholder="cosmocoders"
-        placeholderTextColor="#777"
       />
 
       <Pressable
@@ -42,20 +38,9 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f0f0f",
-    padding: 20,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 28,
-    marginBottom: 30,
-  },
-  label: {
-    color: "#9ca3af",
-    marginBottom: 6,
-  },
+  container: { flex: 1, backgroundColor: "#0f0f0f", padding: 20 },
+  title: { color: "#fff", fontSize: 28, marginBottom: 30 },
+  label: { color: "#9ca3af", marginBottom: 6 },
   input: {
     backgroundColor: "#1a1a1a",
     color: "#fff",
@@ -69,8 +54,5 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
   },
-  buttonText: {
-    color: "#000",
-    fontWeight: "bold",
-  },
+  buttonText: { color: "#000", fontWeight: "bold" },
 });

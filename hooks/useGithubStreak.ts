@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 export function useGithubStreak(username: string) {
   const [streak, setStreak] = useState(0);
@@ -14,43 +13,51 @@ export function useGithubStreak(username: string) {
 
     async function fetchData() {
       try {
-        const res = await axios.get(
+        const res = await fetch(
           `https://api.github.com/users/${username}/events/public`
         );
+        const events = await res.json();
 
-        const events = res.data;
-        const map = new Map<string, number>();
+        const commitDays = new Set<string>();
 
-        events.forEach((e: any) => {
+        for (const e of events) {
           if (e.type === "PushEvent") {
-            const day = e.created_at.split("T")[0];
-            map.set(day, (map.get(day) || 0) + 1);
+            commitDays.add(e.created_at.slice(0, 10));
           }
-        });
+        }
 
-        // Build last 90 days heatmap
-        const today = new Date();
+        // streak (calendar-day based)
+        let count = 0;
+        let cursor = new Date();
+
+        while (true) {
+          const key = cursor.toISOString().slice(0, 10);
+          if (commitDays.has(key)) {
+            count++;
+            cursor.setDate(cursor.getDate() - 1);
+          } else {
+            break;
+          }
+        }
+
+        setStreak(count);
+
+        // heatmap (last 90 days)
         const days: number[] = [];
+        const today = new Date();
 
         for (let i = 89; i >= 0; i--) {
           const d = new Date(today);
           d.setDate(today.getDate() - i);
-          const key = d.toISOString().split("T")[0];
-          days.push(map.get(key) || 0);
+          const key = d.toISOString().slice(0, 10);
+          days.push(commitDays.has(key) ? 1 : 0);
         }
 
         setHeatmap(days);
-
-        // Calculate streak
-        let count = 0;
-        for (let i = days.length - 1; i >= 0; i--) {
-          if (days[i] > 0) count++;
-          else break;
-        }
-
-        setStreak(count);
       } catch (e) {
-        console.error("GitHub error:", e);
+        console.log("GitHub error:", e);
+        setStreak(0);
+        setHeatmap([]);
       } finally {
         setLoading(false);
       }

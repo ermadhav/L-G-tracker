@@ -10,9 +10,9 @@ export function useUsernames() {
 
   useEffect(() => {
     (async () => {
-      const data = await AsyncStorage.getItem(KEY);
-      if (data) {
-        const parsed = JSON.parse(data);
+      const raw = await AsyncStorage.getItem(KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
         setGithub(parsed.github || "");
         setLeetcode(parsed.leetcode || "");
       }

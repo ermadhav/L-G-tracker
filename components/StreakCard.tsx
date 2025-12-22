@@ -24,15 +24,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     padding: 20,
     borderRadius: 16,
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  title: {
-    color: "#9ca3af",
-  },
+  title: { color: "#9ca3af" },
   value: {
     color: "#fff",
     fontSize: 26,
     fontWeight: "bold",
-    marginTop: 8,
+    marginTop: 6,
   },
 });
