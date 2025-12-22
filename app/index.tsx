@@ -6,7 +6,6 @@ import { useGithubStreak } from "../hooks/useGithubStreak";
 import { useLeetcodeStreak } from "../hooks/useLeetcodeStreak";
 import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
-import { scheduleStreakWarning } from "../utils/notifications";
 import { testNotification } from "@/utils/testNotification";
 
 
@@ -16,9 +15,9 @@ export default function Home() {
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetcodeStreak(leetcode);
 
-  useEffect(() => {
-    scheduleStreakWarning();
-  }, []);
+  // useEffect(() => {
+    // scheduleStreakWarning();
+  // }, []);
 
   if (!loaded) return null;
 
@@ -28,11 +27,8 @@ export default function Home() {
         <Text style={styles.settings}>⚙️ Settings</Text>
       </Pressable>
 
-      {/* <Pressable onPress={() => router.push("/test-leetcode")}>
-        <Text style={styles.settings}>⚙️ tests</Text>
-      </Pressable> */}
 
-      <Button title="Test Notification" onPress={testNotification} />
+
 
       <StreakCard
         title="GitHub Streak (Public)"
