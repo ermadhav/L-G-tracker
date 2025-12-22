@@ -1,36 +1,31 @@
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
+import { GlassCard } from "./GlassCard";
 
-export default function StreakCard({
+export function StreakCard({
   title,
   streak,
-  loading,
+  color,
 }: {
   title: string;
   streak: number;
-  loading: boolean;
+  color: string;
 }) {
   return (
-    <View style={styles.card}>
+    <GlassCard>
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.value}>
-        {loading ? "Loading..." : `🔥 ${streak} days`}
-      </Text>
-    </View>
+      <Text style={[styles.streak, { color }]}>🔥 {streak} days</Text>
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#1a1a1a",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 12,
+  title: {
+    color: "#aaa",
+    fontSize: 14,
+    marginBottom: 8,
   },
-  title: { color: "#9ca3af" },
-  value: {
-    color: "#fff",
-    fontSize: 26,
+  streak: {
+    fontSize: 32,
     fontWeight: "bold",
-    marginTop: 6,
   },
 });
