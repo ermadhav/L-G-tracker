@@ -11,7 +11,7 @@ export default function StreakCard({ title, streak, loading }: Props) {
     <View style={styles.card}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.streak}>
-        {loading ? "Loading..." : `🔥 ${streak} days`}
+        {loading ? "Loading..." : `🔥 ${streak ?? 0} days`}
       </Text>
     </View>
   );

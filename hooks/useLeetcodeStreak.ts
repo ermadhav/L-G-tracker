@@ -11,9 +11,16 @@ export function useLeetcodeStreak(username: string) {
         const res = await axios.get(
           `https://leetcode-stats-api.herokuapp.com/${username}`
         );
-        setStreak(res.data.streak);
+
+        // Defensive check
+        if (typeof res.data.streak === "number") {
+          setStreak(res.data.streak);
+        } else {
+          setStreak(0);
+        }
       } catch (err) {
         console.error("LeetCode streak error:", err);
+        setStreak(0);
       } finally {
         setLoading(false);
       }
