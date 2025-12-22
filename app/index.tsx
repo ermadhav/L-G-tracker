@@ -1,28 +1,44 @@
-import { View, Text, StyleSheet } from "react-native";
-import StreakCard from "../components/StreakCard";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
 import { useLeetcodeStreak } from "../hooks/useLeetcodeStreak";
-import { GITHUB_TOKEN, LEETCODE_USERNAME } from "../constants/config";
+import { Heatmap } from "../components/Heatmap";
+import StreakCard from "../components/StreakCard";
+import { scheduleStreakWarning } from "../utils/notifications";
 
-export default function HomeScreen() {
-  const github = useGithubStreak(GITHUB_TOKEN);
-  const leetcode = useLeetcodeStreak(LEETCODE_USERNAME);
+export default function Home() {
+  const { github, leetcode, loaded } = useUsernames();
+
+  const githubData = useGithubStreak(github);
+  const leetcodeData = useLeetcodeStreak(leetcode);
+
+  useEffect(() => {
+    scheduleStreakWarning();
+  }, []);
+
+  if (!loaded) return null;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>🔥 Streak Tracker</Text>
+      <Pressable onPress={() => router.push("/settings")}>
+        <Text style={styles.settings}>⚙️ Settings</Text>
+      </Pressable>
 
       <StreakCard
-        title="GitHub Commit Streak"
-        streak={github.streak}
-        loading={github.loading}
+        title="GitHub Streak (Public)"
+        streak={githubData.streak}
+        loading={githubData.loading}
       />
+      <Heatmap data={githubData.heatmap} />
 
       <StreakCard
         title="LeetCode Streak"
-        streak={leetcode.streak}
-        loading={leetcode.loading}
+        streak={leetcodeData.streak}
+        loading={leetcodeData.loading}
       />
+      <Heatmap data={leetcodeData.heatmap} />
     </View>
   );
 }
@@ -30,13 +46,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#0f0f0f",
     padding: 20,
-    backgroundColor: "#121212",
   },
-  header: {
-    color: "#fff",
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 30,
+  settings: {
+    color: "#22c55e",
+    marginBottom: 16,
+    fontSize: 16,
   },
 });

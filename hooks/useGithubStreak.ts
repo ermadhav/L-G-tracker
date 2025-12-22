@@ -1,69 +1,63 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-type ContributionDay = {
-  date: string;
-  contributionCount: number;
-};
-
-export function useGithubStreak(token: string) {
-  const [streak, setStreak] = useState<number>(0);
+export function useGithubStreak(username: string) {
+  const [streak, setStreak] = useState(0);
+  const [heatmap, setHeatmap] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchStreak() {
+    if (!username) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchData() {
       try {
-        const query = `
-          query {
-            viewer {
-              contributionsCollection {
-                contributionCalendar {
-                  weeks {
-                    contributionDays {
-                      date
-                      contributionCount
-                    }
-                  }
-                }
-              }
-            }
-          }
-        `;
-
-        const res = await axios.post(
-          "https://api.github.com/graphql",
-          { query },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const res = await axios.get(
+          `https://api.github.com/users/${username}/events/public`
         );
 
-        const weeks =
-          res.data.data.viewer.contributionsCollection
-            .contributionCalendar.weeks;
+        const events = res.data;
+        const map = new Map<string, number>();
 
-        const days: ContributionDay[] = weeks.flatMap(
-          (week: any) => week.contributionDays
-        );
+        events.forEach((e: any) => {
+          if (e.type === "PushEvent") {
+            const day = e.created_at.split("T")[0];
+            map.set(day, (map.get(day) || 0) + 1);
+          }
+        });
 
+        // Build last 90 days heatmap
+        const today = new Date();
+        const days: number[] = [];
+
+        for (let i = 89; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(today.getDate() - i);
+          const key = d.toISOString().split("T")[0];
+          days.push(map.get(key) || 0);
+        }
+
+        setHeatmap(days);
+
+        // Calculate streak
         let count = 0;
         for (let i = days.length - 1; i >= 0; i--) {
-          if (days[i].contributionCount > 0) count++;
+          if (days[i] > 0) count++;
           else break;
         }
 
         setStreak(count);
-      } catch (err) {
-        console.error("GitHub streak error:", err);
+      } catch (e) {
+        console.error("GitHub error:", e);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchStreak();
-  }, []);
+    fetchData();
+  }, [username]);
 
-  return { streak, loading };
+  return { streak, heatmap, loading };
 }

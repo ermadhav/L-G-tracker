@@ -1,2 +1,4 @@
-export const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
-export const LEETCODE_USERNAME =process.env.EXPO_PUBLIC_LEETCODE_USERNAME!;
+import Constants from "expo-constants";
+
+export const GITHUB_TOKEN =
+  Constants.expoConfig?.extra?.githubToken as string;
