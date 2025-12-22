@@ -1,54 +1,51 @@
 import { View } from "react-native";
 
 type HeatmapProps = {
-  data?: number[];          // 👈 optional & safe
-  containerWidth: number;
+  data?: number[];           // safe optional
+  containerWidth?: number;   // safe optional
 };
 
-const ROWS = 7;             // days in a week
+const ROWS = 7;              // days in a week
 const GAP = 4;
 const MIN_CELL = 12;
+const FALLBACK_WIDTH = 300;  // ✅ fallback if width is missing
 
 export function Heatmap({
-  data = [],                // 👈 default fallback
-  containerWidth,
+  data = [],
+  containerWidth = FALLBACK_WIDTH,
 }: HeatmapProps) {
-  /* ---------- HARD GUARDS ---------- */
-  if (
-    !containerWidth ||
-    !Array.isArray(data) ||
-    data.length === 0
-  ) {
+  // 🔒 HARD GUARDS (NO CRASH POSSIBLE)
+  if (!Array.isArray(data) || data.length === 0) {
     return null;
   }
 
-  /* ---------- CALCULATE COLUMNS ---------- */
-  const columns = Math.floor(
-    (containerWidth + GAP) / (MIN_CELL + GAP)
+  // Ensure width is usable
+  const width = containerWidth > 0 ? containerWidth : FALLBACK_WIDTH;
+
+  // Calculate how many columns fit
+  const columns = Math.max(
+    1,
+    Math.floor((width + GAP) / (MIN_CELL + GAP))
   );
 
-  if (columns <= 0) return null;
-
   const cellSize =
-    (containerWidth - GAP * (columns - 1)) / columns;
+    (width - GAP * (columns - 1)) / columns;
 
-  if (cellSize <= 0 || !Number.isFinite(cellSize)) {
+  if (!Number.isFinite(cellSize) || cellSize <= 0) {
     return null;
   }
 
-  /* ---------- SLICE DATA SAFELY ---------- */
+  // Take only visible portion
   const visibleData = data.slice(-columns * ROWS);
 
-  /* ---------- BUILD GRID (COLUMN-FIRST) ---------- */
+  // Build column-first grid (GitHub style)
   const grid: number[][] = [];
-
   for (let c = 0; c < columns; c++) {
     grid.push(
       visibleData.slice(c * ROWS, c * ROWS + ROWS)
     );
   }
 
-  /* ---------- RENDER ---------- */
   return (
     <View style={{ flexDirection: "row", gap: GAP }}>
       {grid.map((col, colIndex) => (

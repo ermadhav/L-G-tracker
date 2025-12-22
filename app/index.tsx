@@ -202,5 +202,6 @@ const styles = StyleSheet.create({
     padding: moderateScale(12),
     borderRadius: moderateScale(14),
     backgroundColor: "rgba(0,0,0,0.35)",
+    minHeight: 100,
   },
 });
