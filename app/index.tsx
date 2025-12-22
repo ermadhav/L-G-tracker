@@ -42,62 +42,78 @@ export default function Home() {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Dev Streaks</Text>
-            <Pressable
-              onPress={() => router.push("/settings")}
-              style={styles.settingsBtn}
-            >
-              <Text style={styles.settingsText}>⚙️</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => router.push("/stats")}
-              style={styles.statsBtn}
-            >
-              <Text style={styles.statsText}>📊 Stats</Text>
-            </Pressable>
+
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Pressable
+                onPress={() => router.push("/stats")}
+                style={styles.statsBtn}
+              >
+                <Text style={styles.statsText}>📊</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => router.push("/settings")}
+                style={styles.settingsBtn}
+              >
+                <Text style={styles.settingsText}>⚙️</Text>
+              </Pressable>
+            </View>
           </View>
 
           {/* Cards */}
           <View
             style={[styles.cardsWrapper, isWide && styles.cardsWrapperWide]}
           >
-            {/* GitHub */}
+            {/* ---------------- GITHUB ---------------- */}
             <View style={styles.card}>
               <StreakCard
                 title={`GitHub · ${github}`}
-                streak={githubData.streak}
+                streak={githubData.currentStreak ?? 0}
                 loading={githubData.loading}
               />
 
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setGithubWidth(e.nativeEvent.layout.width)
+                  }
                 >
-                  <Heatmap
-                    data={githubData.heatmap}
-                    containerWidth={githubWidth}
-                  />
+                  {Array.isArray(githubData.heatmap) &&
+                    githubData.heatmap.length > 0 &&
+                    githubWidth > 0 && (
+                      <Heatmap
+                        data={githubData.heatmap}
+                        containerWidth={githubWidth}
+                      />
+                    )}
                 </View>
               )}
             </View>
 
-            {/* LeetCode */}
+            {/* ---------------- LEETCODE ---------------- */}
             <View style={styles.card}>
               <StreakCard
                 title={`LeetCode · ${leetcode}`}
-                streak={leetcodeData.streak}
+                streak={leetcodeData.currentStreak ?? 0}
                 loading={leetcodeData.loading}
               />
 
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setLeetcodeWidth(e.nativeEvent.layout.width)
+                  }
                 >
-                  <Heatmap
-                    data={leetcodeData.heatmap}
-                    containerWidth={leetcodeWidth}
-                  />
+                  {Array.isArray(leetcodeData.heatmap) &&
+                    leetcodeData.heatmap.length > 0 &&
+                    leetcodeWidth > 0 && (
+                      <Heatmap
+                        data={leetcodeData.heatmap}
+                        containerWidth={leetcodeWidth}
+                      />
+                    )}
                 </View>
               )}
             </View>
@@ -109,22 +125,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  statsBtn: {
-    padding: moderateScale(12),
-    borderRadius: moderateScale(16),
-    backgroundColor: "rgba(250,204,21,0.15)",
-    borderWidth: 1,
-    borderColor: "rgba(250,204,21,0.4)",
-  },
-
-  statsText: {
-    fontSize: moderateScale(18),
-    color: "#facc15",
-  },
+  container: { flex: 1 },
 
   content: {
     paddingHorizontal: moderateScale(20),
@@ -162,6 +163,19 @@ const styles = StyleSheet.create({
   settingsText: {
     fontSize: moderateScale(18),
     color: "#22c55e",
+  },
+
+  statsBtn: {
+    padding: moderateScale(12),
+    borderRadius: moderateScale(16),
+    backgroundColor: "rgba(250,204,21,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(250,204,21,0.4)",
+  },
+
+  statsText: {
+    fontSize: moderateScale(18),
+    color: "#facc15",
   },
 
   cardsWrapper: {

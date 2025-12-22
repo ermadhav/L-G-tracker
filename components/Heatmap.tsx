@@ -1,19 +1,19 @@
 import { View } from "react-native";
 
 type HeatmapProps = {
-  data?: number[];           // 👈 OPTIONAL
+  data?: number[];          // 👈 optional & safe
   containerWidth: number;
 };
 
-const ROWS = 7;
+const ROWS = 7;             // days in a week
 const GAP = 4;
 const MIN_CELL = 12;
 
 export function Heatmap({
-  data = [],                 // 👈 SAFE DEFAULT
+  data = [],                // 👈 default fallback
   containerWidth,
 }: HeatmapProps) {
-  // 🔒 HARD GUARDS
+  /* ---------- HARD GUARDS ---------- */
   if (
     !containerWidth ||
     !Array.isArray(data) ||
@@ -22,7 +22,7 @@ export function Heatmap({
     return null;
   }
 
-  // Calculate how many columns fit
+  /* ---------- CALCULATE COLUMNS ---------- */
   const columns = Math.floor(
     (containerWidth + GAP) / (MIN_CELL + GAP)
   );
@@ -32,27 +32,30 @@ export function Heatmap({
   const cellSize =
     (containerWidth - GAP * (columns - 1)) / columns;
 
-  // Prevent NaN / negative sizes
-  if (cellSize <= 0) return null;
+  if (cellSize <= 0 || !Number.isFinite(cellSize)) {
+    return null;
+  }
 
-  // Only show what fits
+  /* ---------- SLICE DATA SAFELY ---------- */
   const visibleData = data.slice(-columns * ROWS);
 
-  // Build column-first grid (GitHub style)
+  /* ---------- BUILD GRID (COLUMN-FIRST) ---------- */
   const grid: number[][] = [];
+
   for (let c = 0; c < columns; c++) {
     grid.push(
       visibleData.slice(c * ROWS, c * ROWS + ROWS)
     );
   }
 
+  /* ---------- RENDER ---------- */
   return (
     <View style={{ flexDirection: "row", gap: GAP }}>
-      {grid.map((col, i) => (
-        <View key={i} style={{ gap: GAP }}>
-          {col.map((value, j) => (
+      {grid.map((col, colIndex) => (
+        <View key={colIndex} style={{ gap: GAP }}>
+          {col.map((value, rowIndex) => (
             <View
-              key={j}
+              key={rowIndex}
               style={{
                 width: cellSize,
                 height: cellSize,
@@ -67,8 +70,9 @@ export function Heatmap({
   );
 }
 
+/* ---------- COLOR SCALE ---------- */
 function getHeatColor(value: number) {
-  if (value === 0) return "#1f2937";
+  if (value <= 0) return "#1f2937";
   if (value < 3) return "#14532d";
   if (value < 6) return "#166534";
   if (value < 10) return "#22c55e";
