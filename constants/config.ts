@@ -1,2 +1,2 @@
-export const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-export const LEETCODE_USERNAME = "cosmocoders";
+export const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
+export const LEETCODE_USERNAME =process.env.EXPO_PUBLIC_LEETCODE_USERNAME!;
