@@ -1,82 +1,58 @@
 import { useEffect, useState } from "react";
 
-const TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
-
-type Day = { date: string; contributionCount: number };
+const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
 
 export function useGithubStreak(username: string) {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
+  const [heatmap, setHeatmap] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!username) return;
 
-    async function fetchAllYears() {
+    async function fetchData() {
       setLoading(true);
 
-      const allDays: Day[] = [];
-      const currentYear = new Date().getUTCFullYear();
-
-      for (let year = 2015; year <= currentYear; year++) {
-        const from = `${year}-01-01T00:00:00Z`;
-        const to = `${year}-12-31T23:59:59Z`;
-
-        const res = await fetch("https://api.github.com/graphql", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            query: `
-              query ($user: String!, $from: DateTime!, $to: DateTime!) {
-                user(login: $user) {
-                  contributionsCollection(from: $from, to: $to) {
-                    contributionCalendar {
-                      weeks {
-                        contributionDays {
-                          date
-                          contributionCount
-                        }
+      const res = await fetch("https://api.github.com/graphql", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GITHUB_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: `
+            query ($username: String!) {
+              user(login: $username) {
+                contributionsCollection {
+                  contributionCalendar {
+                    weeks {
+                      contributionDays {
+                        date
+                        contributionCount
                       }
                     }
                   }
                 }
               }
-            `,
-            variables: { user: username, from, to },
-          }),
-        });
+            }
+          `,
+          variables: { username },
+        }),
+      });
 
-        const json = await res.json();
-        const weeks =
-          json.data.user.contributionsCollection.contributionCalendar.weeks;
+      const json = await res.json();
+      const days =
+        json.data.user.contributionsCollection.contributionCalendar.weeks
+          .flatMap((w: any) => w.contributionDays);
 
-        weeks.forEach((w: any) =>
-          w.contributionDays.forEach((d: Day) => allDays.push(d))
-        );
-      }
+      // ---------- MAP ----------
+      const map = new Map<string, number>();
+      days.forEach((d: any) =>
+        map.set(d.date, d.contributionCount)
+      );
 
-      // ---------- LONGEST STREAK ----------
-      let longest = 0;
-      let curr = 0;
-
-      for (const d of allDays) {
-        if (d.contributionCount > 0) {
-          curr++;
-          longest = Math.max(longest, curr);
-        } else {
-          curr = 0;
-        }
-      }
-
-      setLongestStreak(longest);
-
-      // ---------- CURRENT STREAK ----------
-      let now = new Date().toISOString().slice(0, 10);
-      const map = new Map(allDays.map((d) => [d.date, d.contributionCount]));
-
+      // ---------- CURRENT ----------
       let streak = 0;
       let cursor = new Date();
 
@@ -89,11 +65,44 @@ export function useGithubStreak(username: string) {
       }
 
       setCurrentStreak(streak);
+
+      // ---------- LONGEST ----------
+      let longest = 0;
+      let current = 0;
+
+      days.forEach((d: any) => {
+        if (d.contributionCount > 0) {
+          current++;
+          longest = Math.max(longest, current);
+        } else {
+          current = 0;
+        }
+      });
+
+      setLongestStreak(longest);
+
+      // ---------- HEATMAP (LAST 90 DAYS) ----------
+      const heat: number[] = [];
+      const today = new Date();
+
+      for (let i = 89; i >= 0; i--) {
+        const d = new Date(today);
+        d.setUTCDate(today.getUTCDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        heat.push(map.get(key) || 0);
+      }
+
+      setHeatmap(heat);
       setLoading(false);
     }
 
-    fetchAllYears();
+    fetchData();
   }, [username]);
 
-  return { currentStreak, longestStreak, loading };
+  return {
+    currentStreak,
+    longestStreak,
+    heatmap,
+    loading,
+  };
 }
