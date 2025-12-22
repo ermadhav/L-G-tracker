@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 
@@ -35,18 +29,13 @@ export default function Stats() {
   if (githubData.loading || leetcodeData.loading) return null;
 
   const data =
-    platform === "github"
-      ? githubData.heatmap
-      : leetcodeData.heatmap;
+    platform === "github" ? githubData.heatmap : leetcodeData.heatmap;
 
   const accent = platform === "github" ? "#facc15" : "#f59e0b";
 
   const week = getWeeklySummary(data);
   const month = getMonthlySummary(data);
-  const compare = getComparison(
-    data.slice(-7),
-    data.slice(-14, -7)
-  );
+  const compare = getComparison(data.slice(-7), data.slice(-14, -7));
 
   return (
     <LinearGradient
@@ -54,36 +43,43 @@ export default function Stats() {
       style={styles.container}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Your Stats</Text>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Your Progress</Text>
+          <Text style={styles.subtitle}>
+            Track consistency, not competition
+          </Text>
+        </View>
 
         {/* PLATFORM TOGGLE */}
         <View style={styles.toggleRow}>
-          <Pressable
-            onPress={() => setPlatform("github")}
-            style={[
-              styles.toggleBtn,
-              platform === "github" && styles.githubActive,
-            ]}
-          >
-            <Text style={styles.toggleText}>
+          <Pressable onPress={() => setPlatform("github")}>
+            <Text
+              style={[
+                styles.toggleLabel,
+                platform === "github" && styles.toggleActive,
+              ]}
+            >
               GitHub · {github}
             </Text>
+            {platform === "github" && <View style={styles.underline} />}
           </Pressable>
 
-          <Pressable
-            onPress={() => setPlatform("leetcode")}
-            style={[
-              styles.toggleBtn,
-              platform === "leetcode" && styles.leetcodeActive,
-            ]}
-          >
-            <Text style={styles.toggleText}>
+          <Pressable onPress={() => setPlatform("leetcode")}>
+            <Text
+              style={[
+                styles.toggleLabel,
+                platform === "leetcode" && styles.toggleActive,
+              ]}
+            >
               LeetCode · {leetcode}
             </Text>
+            {platform === "leetcode" && <View style={styles.underline} />}
           </Pressable>
         </View>
 
         {/* STREAKS */}
+        <Text style={styles.section}>Streaks</Text>
         <View style={styles.row}>
           <StatCard
             label="Current Streak"
@@ -97,35 +93,38 @@ export default function Stats() {
           />
         </View>
 
-        {/* WEEK */}
+        {/* WEEKLY */}
+        <Text style={styles.section}>This Week</Text>
         <View style={styles.row}>
           <StatCard
-            label="Active Days (7d)"
+            label="Active Days"
             value={`${week.activeDays}/7`}
             accent={accent}
           />
           <StatCard
-            label="Total (7d)"
+            label="Total Activity"
             value={`${week.total}`}
             accent={accent}
           />
         </View>
 
-        {/* MONTH */}
+        {/* MONTHLY */}
+        <Text style={styles.section}>This Month</Text>
         <View style={styles.row}>
           <StatCard
-            label="Active Days (30d)"
+            label="Active Days"
             value={`${month.activeDays}/30`}
             accent={accent}
           />
           <StatCard
-            label="Total (30d)"
+            label="Total Activity"
             value={`${month.total}`}
             accent={accent}
           />
         </View>
 
         {/* HEALTH */}
+        <Text style={styles.section}>Consistency</Text>
         <View style={styles.row}>
           <StatCard
             label="Week-over-week"
@@ -135,7 +134,7 @@ export default function Stats() {
           <StatCard
             label="Health Score"
             value={`${getHealthScore(data)}/100`}
-            accent="#facc15"
+            accent="#22c55e"
           />
         </View>
 
@@ -152,55 +151,138 @@ export default function Stats() {
   );
 }
 
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
+  toggleRow: {
+    flexDirection: "row",
+    gap: 24,
+    marginBottom: 26,
+  },
+
+  toggleLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#9ca3af",
+  },
+
+  toggleActive: {
+    color: "#e5e7eb",
+  },
+
+  underline: {
+    height: 2,
+    marginTop: 6,
+    borderRadius: 2,
+    backgroundColor: "#facc15",
+  },
+
+  toggleContainer: {
+    flexDirection: "row",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 999,
+    padding: 4,
+    marginBottom: 26,
+  },
+
+  segment: {
+    flex: 2,
+    paddingVertical: 10,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  segmentText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#9ca3af",
+  },
+
+  segmentTextActive: {
+    color: "#020617",
+  },
+
+  segmentActiveGithub: {
+    backgroundColor: "#facc15",
+  },
+
+  segmentActiveLeetcode: {
+    backgroundColor: "#f59e0b",
+  },
+
   container: {
     flex: 1,
     padding: 20,
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#e5e7eb",
-    marginBottom: 18,
+  header: {
+    marginTop: 25,
+    marginBottom: 22,
   },
 
-  toggleRow: {
+  title: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#e5e7eb",
+  },
+
+  subtitle: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "#9ca3af",
+  },
+
+  toggleWrapper: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 26,
   },
 
   toggleBtn: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 12,
-    borderRadius: 14,
+    borderRadius: 999, // pill
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(255,255,255,0.08)",
     backgroundColor: "rgba(255,255,255,0.04)",
   },
 
   toggleText: {
-    color: "#e5e7eb",
+    color: "#9ca3af",
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
   },
 
+  activeText: {
+    color: "#020617",
+  },
+
   githubActive: {
+    backgroundColor: "#facc15",
     borderColor: "#facc15",
-    backgroundColor: "rgba(250,204,21,0.15)",
   },
 
   leetcodeActive: {
+    backgroundColor: "#f59e0b",
     borderColor: "#f59e0b",
-    backgroundColor: "rgba(245,158,11,0.15)",
+  },
+
+  section: {
+    marginBottom: 10,
+    marginTop: 6,
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#9ca3af",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
   },
 
   row: {
     flexDirection: "row",
     gap: 14,
-    marginBottom: 16,
+    marginBottom: 18,
   },
 });
