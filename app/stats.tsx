@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
+    marginTop: 25,
     marginBottom: 22,
   },
 
