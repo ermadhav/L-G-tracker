@@ -48,6 +48,12 @@ export default function Home() {
             >
               <Text style={styles.settingsText}>⚙️</Text>
             </Pressable>
+            <Pressable
+              onPress={() => router.push("/stats")}
+              style={styles.statsBtn}
+            >
+              <Text style={styles.statsText}>📊 Stats</Text>
+            </Pressable>
           </View>
 
           {/* Cards */}
@@ -65,9 +71,7 @@ export default function Home() {
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setGithubWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
                 >
                   <Heatmap
                     data={githubData.heatmap}
@@ -88,9 +92,7 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setLeetcodeWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
                 >
                   <Heatmap
                     data={leetcodeData.heatmap}
@@ -109,6 +111,19 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  statsBtn: {
+    padding: moderateScale(12),
+    borderRadius: moderateScale(16),
+    backgroundColor: "rgba(250,204,21,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(250,204,21,0.4)",
+  },
+
+  statsText: {
+    fontSize: moderateScale(18),
+    color: "#facc15",
   },
 
   content: {

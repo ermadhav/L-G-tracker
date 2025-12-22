@@ -1,81 +1,69 @@
 import { useEffect, useState } from "react";
 
 export function useLeetCodeStreak(username: string) {
-  const [streak, setStreak] = useState(0);
-  const [heatmap, setHeatmap] = useState<number[]>([]);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!username) {
-      setLoading(false);
-      return;
-    }
+    if (!username) return;
 
-    async function fetchData() {
-      try {
-        setLoading(true);
+    async function fetchLC() {
+      setLoading(true);
 
-        const res = await fetch(
-          `https://leetcode-stats-api.herokuapp.com/${username}`
-        );
-        const data = await res.json();
+      const res = await fetch("https://leetcode.com/graphql", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `
+            query {
+              matchedUser(username: "${username}") {
+                submissionCalendar
+              }
+            }
+          `,
+        }),
+      });
 
-        const calendar = data.submissionCalendar;
-        if (!calendar) {
-          setStreak(0);
-          setHeatmap([]);
-          return;
-        }
+      const json = await res.json();
+      const calendar = JSON.parse(
+        json.data.matchedUser.submissionCalendar
+      );
 
-        // Map UTC date -> submissions
-        const map = new Map<string, number>();
-        Object.keys(calendar).forEach((ts) => {
-          const date = new Date(Number(ts) * 1000)
-            .toISOString()
-            .slice(0, 10);
-          map.set(date, calendar[ts]);
-        });
+      const days = Object.keys(calendar)
+        .map(Number)
+        .sort((a, b) => a - b);
 
-        // 🔥 START FROM YESTERDAY (UTC)
-        let cursor = new Date();
-        cursor.setUTCDate(cursor.getUTCDate() - 1);
+      // ---------- LONGEST ----------
+      let longest = 0;
+      let curr = 0;
+      let prev = -1;
 
-        let count = 0;
-        while (true) {
-          const key = cursor.toISOString().slice(0, 10);
-          if ((map.get(key) || 0) > 0) {
-            count++;
-            cursor.setUTCDate(cursor.getUTCDate() - 1);
-          } else {
-            break;
-          }
-        }
-
-        setStreak(count);
-
-        // Heatmap (last 90 completed UTC days)
-        const days: number[] = [];
-        const today = new Date();
-
-        for (let i = 89; i >= 0; i--) {
-          const d = new Date(today);
-          d.setUTCDate(today.getUTCDate() - i);
-          const key = d.toISOString().slice(0, 10);
-          days.push(map.get(key) || 0);
-        }
-
-        setHeatmap(days);
-      } catch (e) {
-        console.log("LeetCode error:", e);
-        setStreak(0);
-        setHeatmap([]);
-      } finally {
-        setLoading(false);
+      for (const ts of days) {
+        const day = Math.floor(ts / 86400);
+        if (prev === -1 || day !== prev + 1) curr = 1;
+        else curr++;
+        longest = Math.max(longest, curr);
+        prev = day;
       }
+
+      setLongestStreak(longest);
+
+      // ---------- CURRENT ----------
+      let streak = 0;
+      let today = Math.floor(Date.now() / 1000 / 86400) - 1;
+
+      while (calendar[today * 86400]) {
+        streak++;
+        today--;
+      }
+
+      setCurrentStreak(streak);
+      setLoading(false);
     }
 
-    fetchData();
+    fetchLC();
   }, [username]);
 
-  return { streak, heatmap, loading };
+  return { currentStreak, longestStreak, loading };
 }
