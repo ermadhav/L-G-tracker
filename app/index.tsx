@@ -71,7 +71,7 @@ export default function Home() {
                 streak={githubData.currentStreak ?? 0}
                 loading={githubData.loading}
               />
-
+              
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}

@@ -5,6 +5,7 @@ const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
 export function useGithubStreak(username: string) {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
+  const [totalCommits, setTotalCommits] = useState(0); // ✅ NEW
   const [heatmap, setHeatmap] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,11 +49,18 @@ export function useGithubStreak(username: string) {
 
       // ---------- MAP ----------
       const map = new Map<string, number>();
-      days.forEach((d: any) =>
-        map.set(d.date, d.contributionCount)
-      );
+      days.forEach((d: any) => {
+        map.set(d.date, d.contributionCount);
+      });
 
-      // ---------- CURRENT ----------
+      // ---------- TOTAL COMMITS (LIFETIME) ----------
+      const total = days.reduce(
+        (sum: number, d: any) => sum + d.contributionCount,
+        0
+      );
+      setTotalCommits(total);
+
+      // ---------- CURRENT STREAK ----------
       let streak = 0;
       let cursor = new Date();
 
@@ -61,12 +69,14 @@ export function useGithubStreak(username: string) {
         if ((map.get(key) || 0) > 0) {
           streak++;
           cursor.setUTCDate(cursor.getUTCDate() - 1);
-        } else break;
+        } else {
+          break;
+        }
       }
 
       setCurrentStreak(streak);
 
-      // ---------- LONGEST ----------
+      // ---------- LONGEST STREAK ----------
       let longest = 0;
       let current = 0;
 
@@ -101,7 +111,8 @@ export function useGithubStreak(username: string) {
 
   return {
     currentStreak,
-    longestStreak,
+    longestStreak,     // ≈ 250 days
+    totalCommits,      // ✅ NEW
     heatmap,
     loading,
   };

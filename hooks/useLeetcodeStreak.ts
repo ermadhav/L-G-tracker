@@ -4,6 +4,12 @@ export function useLeetCodeStreak(username: string) {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
   const [heatmap, setHeatmap] = useState<number[]>([]);
+  const [solved, setSolved] = useState({
+    easy: 0,
+    medium: 0,
+    hard: 0,
+    total: 0,
+  }); // ✅ NEW
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +26,12 @@ export function useLeetCodeStreak(username: string) {
             query {
               matchedUser(username: "${username}") {
                 submissionCalendar
+                submitStats {
+                  acSubmissionNum {
+                    difficulty
+                    count
+                  }
+                }
               }
             }
           `,
@@ -27,6 +39,28 @@ export function useLeetCodeStreak(username: string) {
       });
 
       const json = await res.json();
+
+      /* ---------- SOLVED STATS ---------- */
+      const stats =
+        json.data.matchedUser.submitStats.acSubmissionNum;
+
+      const solvedMap = {
+        easy: 0,
+        medium: 0,
+        hard: 0,
+        total: 0,
+      };
+
+      stats.forEach((s: any) => {
+        if (s.difficulty === "Easy") solvedMap.easy = s.count;
+        if (s.difficulty === "Medium") solvedMap.medium = s.count;
+        if (s.difficulty === "Hard") solvedMap.hard = s.count;
+        if (s.difficulty === "All") solvedMap.total = s.count;
+      });
+
+      setSolved(solvedMap);
+
+      /* ---------- STREAKS ---------- */
       const calendar = JSON.parse(
         json.data.matchedUser.submissionCalendar
       );
@@ -92,7 +126,8 @@ export function useLeetCodeStreak(username: string) {
 
   return {
     currentStreak,
-    longestStreak,
+    longestStreak,   // ≈ 250 days
+    solved,          // ✅ NEW
     heatmap,
     loading,
   };
