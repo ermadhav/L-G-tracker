@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
 
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
@@ -21,6 +22,9 @@ export default function Home() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const isWide = width >= 1024;
+
+  const [githubWidth, setGithubWidth] = useState(0);
+  const [leetcodeWidth, setLeetcodeWidth] = useState(0);
 
   const { github, leetcode, loaded } = useUsernames();
   const githubData = useGithubStreak(github);
@@ -38,7 +42,6 @@ export default function Home() {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Dev Streaks</Text>
-
             <Pressable
               onPress={() => router.push("/settings")}
               style={styles.settingsBtn}
@@ -49,10 +52,7 @@ export default function Home() {
 
           {/* Cards */}
           <View
-            style={[
-              styles.cardsWrapper,
-              isWide && styles.cardsWrapperWide,
-            ]}
+            style={[styles.cardsWrapper, isWide && styles.cardsWrapperWide]}
           >
             {/* GitHub */}
             <View style={styles.card}>
@@ -63,8 +63,16 @@ export default function Home() {
               />
 
               {!githubData.loading && (
-                <View style={styles.heatmapWrapper}>
-                  <Heatmap data={githubData.heatmap} />
+                <View
+                  style={styles.heatmapWrapper}
+                  onLayout={(e) =>
+                    setGithubWidth(e.nativeEvent.layout.width)
+                  }
+                >
+                  <Heatmap
+                    data={githubData.heatmap}
+                    containerWidth={githubWidth}
+                  />
                 </View>
               )}
             </View>
@@ -78,8 +86,16 @@ export default function Home() {
               />
 
               {!leetcodeData.loading && (
-                <View style={styles.heatmapWrapper}>
-                  <Heatmap data={leetcodeData.heatmap} />
+                <View
+                  style={styles.heatmapWrapper}
+                  onLayout={(e) =>
+                    setLeetcodeWidth(e.nativeEvent.layout.width)
+                  }
+                >
+                  <Heatmap
+                    data={leetcodeData.heatmap}
+                    containerWidth={leetcodeWidth}
+                  />
                 </View>
               )}
             </View>
@@ -89,6 +105,7 @@ export default function Home() {
     </LinearGradient>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -102,8 +119,8 @@ const styles = StyleSheet.create({
 
   tabletContent: {
     alignSelf: "center",
-    width: "100%",
     maxWidth: 900,
+    width: "100%",
   },
 
   header: {
@@ -117,7 +134,6 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(28),
     fontWeight: "800",
     color: "#e5e7eb",
-    letterSpacing: 0.6,
   },
 
   settingsBtn: {
@@ -149,10 +165,7 @@ const styles = StyleSheet.create({
     padding: moderateScale(16),
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.06)",
-    shadowColor: "#22c55e",
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 8,
+    overflow: "hidden",
   },
 
   heatmapWrapper: {

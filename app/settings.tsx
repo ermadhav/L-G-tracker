@@ -1,5 +1,12 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import { useUsernames } from "../hooks/useUsernames";
 
 export default function Settings() {
@@ -7,52 +14,116 @@ export default function Settings() {
     useUsernames();
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={["#050505", "#0b1220", "#020617"]}
+      style={styles.container}
+    >
+      {/* Header */}
       <Text style={styles.title}>Settings</Text>
+      <Text style={styles.subtitle}>
+        Configure your developer profiles
+      </Text>
 
-      <Text style={styles.label}>GitHub Username</Text>
-      <TextInput
-        value={github}
-        onChangeText={setGithub}
-        style={styles.input}
-      />
+      {/* GitHub */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>GitHub Username</Text>
+        <TextInput
+          value={github}
+          onChangeText={setGithub}
+          placeholder="e.g. torvalds"
+          placeholderTextColor="#6b7280"
+          style={styles.input}
+          autoCapitalize="none"
+        />
+      </View>
 
-      <Text style={styles.label}>LeetCode Username</Text>
-      <TextInput
-        value={leetcode}
-        onChangeText={setLeetcode}
-        style={styles.input}
-      />
+      {/* LeetCode */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>LeetCode Username</Text>
+        <TextInput
+          value={leetcode}
+          onChangeText={setLeetcode}
+          placeholder="e.g. cosmocoder"
+          placeholderTextColor="#6b7280"
+          style={styles.input}
+          autoCapitalize="none"
+        />
+      </View>
 
+      {/* Save Button */}
       <Pressable
-        style={styles.button}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] },
+        ]}
         onPress={async () => {
           await save();
           router.back();
         }}
       >
-        <Text style={styles.buttonText}>Save</Text>
+        <Text style={styles.buttonText}>Save Changes</Text>
       </Pressable>
-    </View>
+    </LinearGradient>
   );
 }
 
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0f0f0f", padding: 20 },
-  title: { color: "#fff", fontSize: 28, marginBottom: 30 },
-  label: { color: "#9ca3af", marginBottom: 6 },
+  container: {
+    flex: 1,
+    paddingHorizontal: 22,
+    paddingTop: 70,
+  },
+
+  title: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#e5e7eb",
+    marginBottom: 6,
+  },
+
+  subtitle: {
+    color: "#9ca3af",
+    marginBottom: 40,
+  },
+
+  inputGroup: {
+    marginBottom: 26,
+  },
+
+  label: {
+    color: "#9ca3af",
+    fontSize: 13,
+    marginBottom: 8,
+  },
+
   input: {
-    backgroundColor: "#1a1a1a",
-    color: "#fff",
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 20,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    color: "#ffffff",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
+
   button: {
+    marginTop: 20,
     backgroundColor: "#22c55e",
-    padding: 16,
-    borderRadius: 14,
+    paddingVertical: 16,
+    borderRadius: 18,
     alignItems: "center",
+    shadowColor: "#22c55e",
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  buttonText: { color: "#000", fontWeight: "bold" },
+
+  buttonText: {
+    color: "#052e16",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
 });
