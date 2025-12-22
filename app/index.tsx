@@ -45,10 +45,17 @@ export default function Home() {
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <Pressable
+                onPress={() => router.push("/profile-share")}
+                style={styles.shareBtn}
+              >
+                <Text style={styles.shareText}>🔗</Text>
+              </Pressable>
+
+              <Pressable
                 onPress={() => router.push("/stats")}
                 style={styles.statsBtn}
               >
-                <Text style={styles.statsText}>📊 Stats</Text>
+                <Text style={styles.statsText}>📊</Text>
               </Pressable>
 
               <Pressable
@@ -71,13 +78,11 @@ export default function Home() {
                 streak={githubData.currentStreak ?? 0}
                 loading={githubData.loading}
               />
-              
+
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setGithubWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
                 >
                   {Array.isArray(githubData.heatmap) &&
                     githubData.heatmap.length > 0 &&
@@ -102,9 +107,7 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setLeetcodeWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
                 >
                   {Array.isArray(leetcodeData.heatmap) &&
                     leetcodeData.heatmap.length > 0 &&
@@ -126,6 +129,19 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+
+  shareBtn: {
+    padding: moderateScale(12),
+    borderRadius: moderateScale(16),
+    backgroundColor: "rgba(147,197,253,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(147,197,253,0.4)",
+  },
+
+  shareText: {
+    fontSize: moderateScale(18),
+    color: "#93c5fd",
+  },
 
   content: {
     paddingHorizontal: moderateScale(20),
