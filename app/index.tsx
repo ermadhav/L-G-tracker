@@ -48,7 +48,7 @@ export default function Home() {
                 onPress={() => router.push("/stats")}
                 style={styles.statsBtn}
               >
-                <Text style={styles.statsText}>📊</Text>
+                <Text style={styles.statsText}>📊 Stats</Text>
               </Pressable>
 
               <Pressable
