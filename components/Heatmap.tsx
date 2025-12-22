@@ -5,12 +5,17 @@ export function Heatmap({ data }: { data?: number[] }) {
 
   return (
     <View style={styles.grid}>
-      {data.map((v, i) => (
+      {data.map((count, i) => (
         <View
           key={i}
           style={[
             styles.cell,
-            { opacity: v === 0 ? 0.15 : 0.8 },
+            {
+              opacity:
+                count === 0
+                  ? 0.15
+                  : Math.min(0.25 + count * 0.15, 1),
+            },
           ]}
         />
       ))}

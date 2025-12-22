@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const KEY = "STREAK_USERNAMES";
 
-export function useUsernames() {
+export function useUsernames(username: unknown) {
   const [github, setGithub] = useState("");
   const [leetcode, setLeetcode] = useState("");
   const [loaded, setLoaded] = useState(false);
