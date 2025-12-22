@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet ,Button} from "react-native";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { useUsernames } from "../hooks/useUsernames";
@@ -7,6 +7,9 @@ import { useLeetcodeStreak } from "../hooks/useLeetcodeStreak";
 import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
 import { scheduleStreakWarning } from "../utils/notifications";
+import { testNotification } from "@/utils/testNotification";
+
+
 
 export default function Home() {
   const { github, leetcode, loaded } = useUsernames();
@@ -24,6 +27,12 @@ export default function Home() {
       <Pressable onPress={() => router.push("/settings")}>
         <Text style={styles.settings}>⚙️ Settings</Text>
       </Pressable>
+
+      {/* <Pressable onPress={() => router.push("/test-leetcode")}>
+        <Text style={styles.settings}>⚙️ tests</Text>
+      </Pressable> */}
+
+      <Button title="Test Notification" onPress={testNotification} />
 
       <StreakCard
         title="GitHub Streak (Public)"

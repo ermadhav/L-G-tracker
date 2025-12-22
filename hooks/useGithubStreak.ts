@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
+
 export function useGithubStreak(username: string) {
   const [streak, setStreak] = useState(0);
   const [heatmap, setHeatmap] = useState<number[]>([]);
@@ -11,28 +13,56 @@ export function useGithubStreak(username: string) {
       return;
     }
 
-    async function fetchData() {
+    async function fetchStreak() {
       try {
-        const res = await fetch(
-          `https://api.github.com/users/${username}/events/public`
-        );
-        const events = await res.json();
+        setLoading(true);
 
-        const commitDays = new Set<string>();
+        const res = await fetch("https://api.github.com/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${GITHUB_TOKEN}`,
+          },
+          body: JSON.stringify({
+            query: `
+              query ($username: String!) {
+                user(login: $username) {
+                  contributionsCollection {
+                    contributionCalendar {
+                      weeks {
+                        contributionDays {
+                          date
+                          contributionCount
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            variables: { username },
+          }),
+        });
 
-        for (const e of events) {
-          if (e.type === "PushEvent") {
-            commitDays.add(e.created_at.slice(0, 10));
-          }
-        }
+        const json = await res.json();
 
-        // streak (calendar-day based)
-        let count = 0;
+        const days =
+          json.data.user.contributionsCollection.contributionCalendar.weeks
+            .flatMap((w: any) => w.contributionDays);
+
+        // Build date -> count map
+        const map = new Map<string, number>();
+        days.forEach((d: any) => {
+          map.set(d.date, d.contributionCount);
+        });
+
+        // 🔥 GitHub counts TODAY immediately
         let cursor = new Date();
+        let count = 0;
 
         while (true) {
           const key = cursor.toISOString().slice(0, 10);
-          if (commitDays.has(key)) {
+          if ((map.get(key) || 0) > 0) {
             count++;
             cursor.setDate(cursor.getDate() - 1);
           } else {
@@ -42,20 +72,19 @@ export function useGithubStreak(username: string) {
 
         setStreak(count);
 
-        // heatmap (last 90 days)
-        const days: number[] = [];
+        // Heatmap (last 90 days)
+        const heat: number[] = [];
         const today = new Date();
-
         for (let i = 89; i >= 0; i--) {
           const d = new Date(today);
           d.setDate(today.getDate() - i);
           const key = d.toISOString().slice(0, 10);
-          days.push(commitDays.has(key) ? 1 : 0);
+          heat.push(map.get(key) || 0);
         }
 
-        setHeatmap(days);
+        setHeatmap(heat);
       } catch (e) {
-        console.log("GitHub error:", e);
+        console.log("GitHub streak error:", e);
         setStreak(0);
         setHeatmap([]);
       } finally {
@@ -63,7 +92,7 @@ export function useGithubStreak(username: string) {
       }
     }
 
-    fetchData();
+    fetchStreak();
   }, [username]);
 
   return { streak, heatmap, loading };

@@ -13,35 +13,39 @@ export function useLeetcodeStreak(username: string) {
 
     async function fetchData() {
       try {
+        setLoading(true);
+
         const res = await fetch(
           `https://leetcode-stats-api.herokuapp.com/${username}`
         );
         const data = await res.json();
 
-        if (!data.submissionCalendar) {
+        const calendar = data.submissionCalendar;
+        if (!calendar) {
           setStreak(0);
           setHeatmap([]);
           return;
         }
 
-        const calendar = data.submissionCalendar;
+        // Map UTC date -> submissions
         const map = new Map<string, number>();
-
         Object.keys(calendar).forEach((ts) => {
-          const day = new Date(Number(ts) * 1000)
+          const date = new Date(Number(ts) * 1000)
             .toISOString()
             .slice(0, 10);
-          map.set(day, calendar[ts]);
+          map.set(date, calendar[ts]);
         });
 
-        let count = 0;
+        // 🔥 START FROM YESTERDAY (UTC)
         let cursor = new Date();
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
 
+        let count = 0;
         while (true) {
           const key = cursor.toISOString().slice(0, 10);
           if ((map.get(key) || 0) > 0) {
             count++;
-            cursor.setDate(cursor.getDate() - 1);
+            cursor.setUTCDate(cursor.getUTCDate() - 1);
           } else {
             break;
           }
@@ -49,12 +53,13 @@ export function useLeetcodeStreak(username: string) {
 
         setStreak(count);
 
+        // Heatmap (last 90 completed UTC days)
         const days: number[] = [];
         const today = new Date();
 
         for (let i = 89; i >= 0; i--) {
           const d = new Date(today);
-          d.setDate(today.getDate() - i);
+          d.setUTCDate(today.getUTCDate() - i);
           const key = d.toISOString().slice(0, 10);
           days.push(map.get(key) || 0);
         }
