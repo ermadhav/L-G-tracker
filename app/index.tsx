@@ -1,13 +1,27 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
 import { useLeetCodeStreak } from "../hooks/useLeetCodeStreak";
 import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
 
+import { moderateScale, verticalScale } from "../utils/responsive";
+
 export default function Home() {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const isWide = width >= 1024;
+
   const { github, leetcode, loaded } = useUsernames();
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetCodeStreak(leetcode);
@@ -15,42 +29,136 @@ export default function Home() {
   if (!loaded) return null;
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={() => router.push("/settings")}>
-        <Text style={styles.settings}>⚙️ Settings</Text>
-      </Pressable>
+    <LinearGradient
+      colors={["#050505", "#0b1220", "#020617"]}
+      style={styles.container}
+    >
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={[styles.content, isTablet && styles.tabletContent]}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Dev Streaks</Text>
 
-      {/* <Pressable onPress={() => router.push("/test-leetcode")}>
-        <Text style={styles.settings}>⚙️ tests</Text>
-      </Pressable> */}
+            <Pressable
+              onPress={() => router.push("/settings")}
+              style={styles.settingsBtn}
+            >
+              <Text style={styles.settingsText}>⚙️</Text>
+            </Pressable>
+          </View>
 
-      <StreakCard
-        title={`GitHub Streak of ${github}`}
-        streak={githubData.streak}
-        loading={githubData.loading}
-      />
+          {/* Cards */}
+          <View
+            style={[
+              styles.cardsWrapper,
+              isWide && styles.cardsWrapperWide,
+            ]}
+          >
+            {/* GitHub */}
+            <View style={styles.card}>
+              <StreakCard
+                title={`GitHub · ${github}`}
+                streak={githubData.streak}
+                loading={githubData.loading}
+              />
 
-      {!githubData.loading && <Heatmap data={githubData.heatmap} />}
+              {!githubData.loading && (
+                <View style={styles.heatmapWrapper}>
+                  <Heatmap data={githubData.heatmap} />
+                </View>
+              )}
+            </View>
 
-      <StreakCard
-        title={`LeetCode Streak of ${leetcode}`}
-        streak={leetcodeData.streak}
-        loading={leetcodeData.loading}
-      />
+            {/* LeetCode */}
+            <View style={styles.card}>
+              <StreakCard
+                title={`LeetCode · ${leetcode}`}
+                streak={leetcodeData.streak}
+                loading={leetcodeData.loading}
+              />
 
-      {!leetcodeData.loading && <Heatmap data={leetcodeData.heatmap} />}
-    </View>
+              {!leetcodeData.loading && (
+                <View style={styles.heatmapWrapper}>
+                  <Heatmap data={leetcodeData.heatmap} />
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f0f0f",
-    padding: 20,
   },
-  settings: {
+
+  content: {
+    paddingHorizontal: moderateScale(20),
+    paddingTop: verticalScale(60),
+    paddingBottom: verticalScale(40),
+  },
+
+  tabletContent: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 900,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: verticalScale(30),
+  },
+
+  title: {
+    fontSize: moderateScale(28),
+    fontWeight: "800",
+    color: "#e5e7eb",
+    letterSpacing: 0.6,
+  },
+
+  settingsBtn: {
+    padding: moderateScale(12),
+    borderRadius: moderateScale(16),
+    backgroundColor: "rgba(34,197,94,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(34,197,94,0.4)",
+  },
+
+  settingsText: {
+    fontSize: moderateScale(18),
     color: "#22c55e",
-    marginBottom: 16,
+  },
+
+  cardsWrapper: {
+    gap: verticalScale(22),
+  },
+
+  cardsWrapperWide: {
+    flexDirection: "row",
+    gap: moderateScale(20),
+  },
+
+  card: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderRadius: moderateScale(20),
+    padding: moderateScale(16),
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
+    shadowColor: "#22c55e",
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+
+  heatmapWrapper: {
+    marginTop: verticalScale(14),
+    padding: moderateScale(12),
+    borderRadius: moderateScale(14),
+    backgroundColor: "rgba(0,0,0,0.35)",
   },
 });
