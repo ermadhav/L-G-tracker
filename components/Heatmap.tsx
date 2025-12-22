@@ -1,29 +1,44 @@
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 
 type HeatmapProps = {
-  data: number[]; // daily data (oldest → newest)
+  data?: number[];           // 👈 OPTIONAL
   containerWidth: number;
 };
 
-const ROWS = 7; // days in a week
+const ROWS = 7;
 const GAP = 4;
 const MIN_CELL = 12;
 
-export function Heatmap({ data, containerWidth }: HeatmapProps) {
-  if (!containerWidth) return null;
+export function Heatmap({
+  data = [],                 // 👈 SAFE DEFAULT
+  containerWidth,
+}: HeatmapProps) {
+  // 🔒 HARD GUARDS
+  if (
+    !containerWidth ||
+    !Array.isArray(data) ||
+    data.length === 0
+  ) {
+    return null;
+  }
 
-  // Calculate how many columns fit in the container
+  // Calculate how many columns fit
   const columns = Math.floor(
     (containerWidth + GAP) / (MIN_CELL + GAP)
   );
 
+  if (columns <= 0) return null;
+
   const cellSize =
     (containerWidth - GAP * (columns - 1)) / columns;
 
-  // Take only the latest data that fits
+  // Prevent NaN / negative sizes
+  if (cellSize <= 0) return null;
+
+  // Only show what fits
   const visibleData = data.slice(-columns * ROWS);
 
-  // Build column-first (GitHub style)
+  // Build column-first grid (GitHub style)
   const grid: number[][] = [];
   for (let c = 0; c < columns; c++) {
     grid.push(
@@ -59,21 +74,3 @@ function getHeatColor(value: number) {
   if (value < 10) return "#22c55e";
   return "#4ade80";
 }
-
-
-
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    width: 300,
-    marginBottom: 20,
-  },
-  cell: {
-    width: 14,
-    height: 14,
-    margin: 2,
-    borderRadius: 3,
-    backgroundColor: "#22c55e",
-  },
-});
