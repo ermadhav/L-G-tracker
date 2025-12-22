@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useLeetcodeStreak(username: string) {
+export function useLeetCodeStreak(username: string) {
   const [streak, setStreak] = useState(0);
   const [heatmap, setHeatmap] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
