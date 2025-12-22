@@ -39,39 +39,41 @@ export default function Home() {
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={[styles.content, isTablet && styles.tabletContent]}>
-          {/* Header */}
+
+          {/* ===== HEADER ===== */}
           <View style={styles.header}>
             <Text style={styles.title}>Dev Streaks</Text>
 
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <View style={styles.toolbar}>
               <Pressable
                 onPress={() => router.push("/profile-share")}
-                style={styles.shareBtn}
+                style={styles.toolbarBtn}
               >
-                <Text style={styles.shareText}>🔗</Text>
+                <Text style={[styles.toolbarIcon, { color: "#93c5fd" }]}>🔗</Text>
               </Pressable>
 
               <Pressable
                 onPress={() => router.push("/stats")}
-                style={styles.statsBtn}
+                style={styles.toolbarBtn}
               >
-                <Text style={styles.statsText}>📊</Text>
+                <Text style={[styles.toolbarIcon, { color: "#facc15" }]}>📊</Text>
               </Pressable>
 
               <Pressable
                 onPress={() => router.push("/settings")}
-                style={styles.settingsBtn}
+                style={styles.toolbarBtn}
               >
-                <Text style={styles.settingsText}>⚙️</Text>
+                <Text style={[styles.toolbarIcon, { color: "#22c55e" }]}>⚙️</Text>
               </Pressable>
             </View>
           </View>
 
-          {/* Cards */}
+          {/* ===== CARDS ===== */}
           <View
             style={[styles.cardsWrapper, isWide && styles.cardsWrapperWide]}
           >
-            {/* ---------------- GITHUB ---------------- */}
+
+            {/* ---------- GITHUB ---------- */}
             <View style={styles.card}>
               <StreakCard
                 title={`GitHub · ${github}`}
@@ -79,24 +81,36 @@ export default function Home() {
                 loading={githubData.loading}
               />
 
+              {/* USER DETAILS */}
+              {!githubData.loading && (
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaText}>
+                    🏆 Longest: {githubData.longestStreak} days
+                  </Text>
+                  <Text style={styles.metaText}>
+                    📦 Commits: {githubData.totalCommits}
+                  </Text>
+                </View>
+              )}
+
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setGithubWidth(e.nativeEvent.layout.width)
+                  }
                 >
-                  {Array.isArray(githubData.heatmap) &&
-                    githubData.heatmap.length > 0 &&
-                    githubWidth > 0 && (
-                      <Heatmap
-                        data={githubData.heatmap}
-                        containerWidth={githubWidth}
-                      />
-                    )}
+                  {githubData.heatmap.length > 0 && githubWidth > 0 && (
+                    <Heatmap
+                      data={githubData.heatmap}
+                      containerWidth={githubWidth}
+                    />
+                  )}
                 </View>
               )}
             </View>
 
-            {/* ---------------- LEETCODE ---------------- */}
+            {/* ---------- LEETCODE ---------- */}
             <View style={styles.card}>
               <StreakCard
                 title={`LeetCode · ${leetcode}`}
@@ -104,48 +118,57 @@ export default function Home() {
                 loading={leetcodeData.loading}
               />
 
+              {/* USER DETAILS */}
+              {!leetcodeData.loading && (
+                <View style={styles.metaColumn}>
+                  <Text style={styles.metaText}>
+                    🏆 Longest: {leetcodeData.longestStreak} days
+                  </Text>
+                  <Text style={styles.metaText}>
+                    🟢 Easy: {leetcodeData.solved.easy}   🟡 Medium: {leetcodeData.solved.medium}   🔴 Hard: {leetcodeData.solved.hard}
+                  </Text>
+                </View>
+              )}
+
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setLeetcodeWidth(e.nativeEvent.layout.width)
+                  }
                 >
-                  {Array.isArray(leetcodeData.heatmap) &&
-                    leetcodeData.heatmap.length > 0 &&
-                    leetcodeWidth > 0 && (
-                      <Heatmap
-                        data={leetcodeData.heatmap}
-                        containerWidth={leetcodeWidth}
-                      />
-                    )}
+                  {leetcodeData.heatmap.length > 0 && leetcodeWidth > 0 && (
+                    <Heatmap
+                      data={leetcodeData.heatmap}
+                      containerWidth={leetcodeWidth}
+                    />
+                  )}
                 </View>
               )}
             </View>
           </View>
+
+          {/* ===== FOOTER ===== */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Made with ❤️ by Cosmo Coder
+            </Text>
+          </View>
+
         </View>
       </ScrollView>
     </LinearGradient>
   );
 }
 
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
-  shareBtn: {
-    padding: moderateScale(12),
-    borderRadius: moderateScale(16),
-    backgroundColor: "rgba(147,197,253,0.15)",
-    borderWidth: 1,
-    borderColor: "rgba(147,197,253,0.4)",
-  },
-
-  shareText: {
-    fontSize: moderateScale(18),
-    color: "#93c5fd",
-  },
-
   content: {
     paddingHorizontal: moderateScale(20),
-    paddingTop: verticalScale(60),
+    paddingTop: verticalScale(50),
     paddingBottom: verticalScale(40),
   },
 
@@ -155,45 +178,37 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
+  /* HEADER */
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: verticalScale(30),
+    marginBottom: verticalScale(24),
   },
 
   title: {
-    fontSize: moderateScale(28),
+    fontSize: moderateScale(30),
     fontWeight: "800",
     color: "#e5e7eb",
+    marginBottom: 12,
   },
 
-  settingsBtn: {
+  toolbar: {
+    flexDirection: "row",
+    gap: 12,
+    flexWrap: "wrap", // 🔥 future-proof
+  },
+
+  toolbarBtn: {
     padding: moderateScale(12),
     borderRadius: moderateScale(16),
-    backgroundColor: "rgba(34,197,94,0.15)",
+    backgroundColor: "rgba(255,255,255,0.05)",
     borderWidth: 1,
-    borderColor: "rgba(34,197,94,0.4)",
+    borderColor: "rgba(255,255,255,0.08)",
   },
 
-  settingsText: {
+  toolbarIcon: {
     fontSize: moderateScale(18),
-    color: "#22c55e",
   },
 
-  statsBtn: {
-    padding: moderateScale(12),
-    borderRadius: moderateScale(16),
-    backgroundColor: "rgba(250,204,21,0.15)",
-    borderWidth: 1,
-    borderColor: "rgba(250,204,21,0.4)",
-  },
-
-  statsText: {
-    fontSize: moderateScale(18),
-    color: "#facc15",
-  },
-
+  /* CARDS */
   cardsWrapper: {
     gap: verticalScale(22),
   },
@@ -206,11 +221,26 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: "rgba(255,255,255,0.04)",
-    borderRadius: moderateScale(20),
+    borderRadius: moderateScale(22),
     padding: moderateScale(16),
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.06)",
-    overflow: "hidden",
+  },
+
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+
+  metaColumn: {
+    marginTop: 10,
+    gap: 6,
+  },
+
+  metaText: {
+    fontSize: 12,
+    color: "#9ca3af",
   },
 
   heatmapWrapper: {
@@ -219,5 +249,16 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(14),
     backgroundColor: "rgba(0,0,0,0.35)",
     minHeight: 100,
+  },
+
+  /* FOOTER */
+  footer: {
+    marginTop: verticalScale(40),
+    alignItems: "center",
+  },
+
+  footerText: {
+    fontSize: 12,
+    color: "#6b7280",
   },
 });

@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
 
   toggleLabel: {
-    fontSize: 15,
+    fontSize: 14.3,
     fontWeight: "600",
     color: "#9ca3af",
   },
