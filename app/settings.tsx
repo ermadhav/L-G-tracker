@@ -8,6 +8,7 @@ import {
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useUsernames } from "../hooks/useUsernames";
+import { moderateScale, verticalScale } from "../utils/responsive";
 
 export default function Settings() {
   const { github, leetcode, setGithub, setLeetcode, save } =
@@ -63,6 +64,10 @@ export default function Settings() {
       >
         <Text style={styles.buttonText}>Save Changes</Text>
       </Pressable>
+      {/* ===== FOOTER ===== */}
+                <View style={styles.footer}>
+                  <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+                </View>
     </LinearGradient>
   );
 }
@@ -126,4 +131,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 0.5,
   },
+  footer: {
+      marginTop: verticalScale(40),
+      alignItems: "center",
+    },
+  
+    footerText: {
+      fontSize: 12,
+      color: "#6b7280",
+    },
 });

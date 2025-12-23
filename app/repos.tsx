@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
+import { moderateScale, verticalScale } from "../utils/responsive";
 
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubRepos } from "../hooks/useGithubRepos";
@@ -93,6 +94,10 @@ export default function Repos() {
             ))}
           </View>
         )}
+        {/* ===== FOOTER ===== */}
+                  <View style={styles.footer}>
+                    <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+                  </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -161,4 +166,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
   },
+  footer: {
+      marginTop: verticalScale(40),
+      alignItems: "center",
+    },
+  
+    footerText: {
+      fontSize: 12,
+      color: "#6b7280",
+    },
 });

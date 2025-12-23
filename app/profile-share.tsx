@@ -11,6 +11,7 @@ import QRCode from "react-native-qrcode-svg";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { useRef } from "react";
+import { moderateScale, verticalScale } from "../utils/responsive";
 
 import { useUsernames } from "../hooks/useUsernames";
 
@@ -124,6 +125,10 @@ export default function ProfileShare() {
             </Text>
           </Pressable>
         </View>
+        {/* ===== FOOTER ===== */}
+                  <View style={styles.footer}>
+                    <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+                  </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -217,4 +222,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
+  footer: {
+      marginTop: verticalScale(40),
+      alignItems: "center",
+    },
+  
+    footerText: {
+      fontSize: 12,
+      color: "#6b7280",
+    },
 });

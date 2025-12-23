@@ -1,12 +1,7 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
+import { moderateScale, verticalScale } from "../utils/responsive";
 
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
@@ -42,10 +37,7 @@ export default function Stats() {
   /* ===== DERIVED STATS ===== */
   const week = getWeeklySummary(data);
   const month = getMonthlySummary(data);
-  const compare = getComparison(
-    data.slice(-7),
-    data.slice(-14, -7)
-  );
+  const compare = getComparison(data.slice(-7), data.slice(-14, -7));
 
   const health = calculateHealthScore(data);
 
@@ -58,47 +50,31 @@ export default function Stats() {
         {/* ===== HEADER ===== */}
         <View style={styles.header}>
           <Text style={styles.title}>Your Progress</Text>
-          <Text style={styles.subtitle}>
-            Consistency over competition
-          </Text>
+          <Text style={styles.subtitle}>Consistency over competition</Text>
         </View>
 
         {/* ===== PLATFORM TOGGLE ===== */}
         <View style={styles.toggleRow}>
           <Pressable onPress={() => setPlatform("github")}>
-            <Text
-              style={[
-                styles.toggleLabel,
-                isGithub && styles.toggleActive,
-              ]}
-            >
+            <Text style={[styles.toggleLabel, isGithub && styles.toggleActive]}>
               GitHub · {github}
             </Text>
             {isGithub && (
               <View
-                style={[
-                  styles.underline,
-                  { backgroundColor: "#facc15" },
-                ]}
+                style={[styles.underline, { backgroundColor: "#facc15" }]}
               />
             )}
           </Pressable>
 
           <Pressable onPress={() => setPlatform("leetcode")}>
             <Text
-              style={[
-                styles.toggleLabel,
-                !isGithub && styles.toggleActive,
-              ]}
+              style={[styles.toggleLabel, !isGithub && styles.toggleActive]}
             >
               LeetCode · {leetcode}
             </Text>
             {!isGithub && (
               <View
-                style={[
-                  styles.underline,
-                  { backgroundColor: "#f59e0b" },
-                ]}
+                style={[styles.underline, { backgroundColor: "#f59e0b" }]}
               />
             )}
           </Pressable>
@@ -110,22 +86,16 @@ export default function Stats() {
           <StatCard
             label="Current Streak"
             value={`${
-              isGithub
-                ? githubData.currentStreak
-                : leetcodeData.currentStreak
+              isGithub ? githubData.currentStreak : leetcodeData.currentStreak
             } days`}
             accent={accent}
           />
           <StatCard
             label={
-              isGithub
-                ? "Longest Commit Streak"
-                : "Longest Solving Streak"
+              isGithub ? "Longest Commit Streak" : "Longest Solving Streak"
             }
             value={`${
-              isGithub
-                ? githubData.longestStreak
-                : leetcodeData.longestStreak
+              isGithub ? githubData.longestStreak : leetcodeData.longestStreak
             } days`}
             accent={accent}
           />
@@ -223,6 +193,10 @@ export default function Stats() {
           breakdown={health.breakdown}
           explanation={health.explanation}
         />
+        {/* ===== FOOTER ===== */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -289,5 +263,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 14,
     marginBottom: 18,
+  },
+  footer: {
+    marginTop: verticalScale(40),
+    alignItems: "center",
+  },
+
+  footerText: {
+    fontSize: 12,
+    color: "#6b7280",
   },
 });
