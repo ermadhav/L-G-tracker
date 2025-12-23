@@ -70,8 +70,13 @@ export default function Home() {
                   ⚙️
                 </Text>
               </Pressable>
-              <Pressable onPress={() => router.push("/repos")}>
-                <Text>📁</Text>
+              <Pressable
+                onPress={() => router.push("/repos")}
+                style={styles.toolbarBtn}
+              >
+                <Text style={[styles.toolbarIcon, { color: "#22c55e" }]}>
+                  📂
+                </Text>
               </Pressable>
             </View>
           </View>
