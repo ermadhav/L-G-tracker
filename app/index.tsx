@@ -29,7 +29,9 @@ import {
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -74,10 +76,7 @@ export default function Home() {
   /* ================= AUTO-CANCEL IF BOTH DONE ================= */
 
   useEffect(() => {
-    if (
-      !githubData.heatmap?.length ||
-      !leetcodeData.heatmap?.length
-    ) {
+    if (!githubData.heatmap?.length || !leetcodeData.heatmap?.length) {
       return;
     }
 
@@ -171,9 +170,7 @@ export default function Home() {
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setGithubWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
                 >
                   {githubData.heatmap.length > 0 && githubWidth > 0 && (
                     <Heatmap
@@ -212,17 +209,14 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setLeetcodeWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
                 >
-                  {leetcodeData.heatmap.length > 0 &&
-                    leetcodeWidth > 0 && (
-                      <Heatmap
-                        data={leetcodeData.heatmap}
-                        containerWidth={leetcodeWidth}
-                      />
-                    )}
+                  {leetcodeData.heatmap.length > 0 && leetcodeWidth > 0 && (
+                    <Heatmap
+                      data={leetcodeData.heatmap}
+                      containerWidth={leetcodeWidth}
+                    />
+                  )}
                 </View>
               )}
             </View>
@@ -230,9 +224,7 @@ export default function Home() {
 
           {/* ===== FOOTER ===== */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Made with ❤️ by Cosmo Coder
-            </Text>
+            <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
           </View>
         </View>
       </ScrollView>
