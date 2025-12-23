@@ -8,17 +8,30 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
 import { useLeetCodeStreak } from "../hooks/useLeetCodeStreak";
 import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
-
 import { moderateScale, verticalScale } from "../utils/responsive";
 
+/* ================= ANDROID NOTIFICATION CONFIG ================= */
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function Home() {
+  /* ================= HOOKS (ORDER NEVER CHANGES) ================= */
+
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const isWide = width >= 1024;
@@ -30,7 +43,43 @@ export default function Home() {
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetCodeStreak(leetcode);
 
+  /* ================= NOTIFICATION TEST (WORKS 100%) ================= */
+
+  useEffect(() => {
+    async function setupAndTestNotification() {
+      // Permissions
+      await Notifications.requestPermissionsAsync();
+
+      // ANDROID CHANNEL (MANDATORY)
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("streaks", {
+          name: "Streak Reminders",
+          importance: Notifications.AndroidImportance.MAX,
+          sound: "default",
+        });
+      }
+
+      // 🔥 TEST NOTIFICATION (after 5 seconds)
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "🔥 Streak Tracker Test",
+          body: "If you see this, notifications are WORKING",
+        },
+        trigger: {
+          seconds: 5,
+          channelId: "streaks",
+        },
+      });
+    }
+
+    setupAndTestNotification();
+  }, []);
+
+  /* ================= SAFE EARLY RETURN ================= */
+
   if (!loaded) return null;
+
+  /* ================= UI ================= */
 
   return (
     <LinearGradient
@@ -70,6 +119,7 @@ export default function Home() {
                   ⚙️
                 </Text>
               </Pressable>
+
               <Pressable
                 onPress={() => router.push("/repos")}
                 style={styles.toolbarBtn}
@@ -93,7 +143,6 @@ export default function Home() {
                 loading={githubData.loading}
               />
 
-              {/* USER DETAILS */}
               {!githubData.loading && (
                 <View style={styles.metaRow}>
                   <Text style={styles.metaText}>
@@ -108,7 +157,9 @@ export default function Home() {
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setGithubWidth(e.nativeEvent.layout.width)
+                  }
                 >
                   {githubData.heatmap.length > 0 && githubWidth > 0 && (
                     <Heatmap
@@ -128,17 +179,18 @@ export default function Home() {
                 loading={leetcodeData.loading}
               />
 
-              {/* USER DETAILS */}
               {!leetcodeData.loading && (
                 <View style={styles.metaColumn}>
                   <Text style={styles.metaText}>
                     🏆 Longest: {leetcodeData.longestStreak} days
                   </Text>
                   <Text style={styles.metaText}>
-                    🟢 Easy: {leetcodeData.solved.easy} 🟡 Medium:{" "}
-                    {leetcodeData.solved.medium} 🔴 Hard:{" "}
+                    🟢 Easy: {leetcodeData.solved.easy} · 🟡 Medium:{" "}
+                    {leetcodeData.solved.medium} · 🔴 Hard:{" "}
                     {leetcodeData.solved.hard}
-                    🟰 Total Solved:{leetcodeData.solved.total}
+                  </Text>
+                  <Text style={styles.metaText}>
+                    🟰 Total Solved: {leetcodeData.solved.total}
                   </Text>
                 </View>
               )}
@@ -146,14 +198,17 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setLeetcodeWidth(e.nativeEvent.layout.width)
+                  }
                 >
-                  {leetcodeData.heatmap.length > 0 && leetcodeWidth > 0 && (
-                    <Heatmap
-                      data={leetcodeData.heatmap}
-                      containerWidth={leetcodeWidth}
-                    />
-                  )}
+                  {leetcodeData.heatmap.length > 0 &&
+                    leetcodeWidth > 0 && (
+                      <Heatmap
+                        data={leetcodeData.heatmap}
+                        containerWidth={leetcodeWidth}
+                      />
+                    )}
                 </View>
               )}
             </View>
@@ -161,7 +216,9 @@ export default function Home() {
 
           {/* ===== FOOTER ===== */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+            <Text style={styles.footerText}>
+              Made with ❤️ by Cosmo Coder
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -186,7 +243,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-  /* HEADER */
   header: {
     marginBottom: verticalScale(24),
   },
@@ -201,7 +257,7 @@ const styles = StyleSheet.create({
   toolbar: {
     flexDirection: "row",
     gap: 12,
-    flexWrap: "wrap", // 🔥 future-proof
+    flexWrap: "wrap",
   },
 
   toolbarBtn: {
@@ -216,7 +272,6 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(18),
   },
 
-  /* CARDS */
   cardsWrapper: {
     gap: verticalScale(22),
   },
@@ -259,7 +314,6 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
 
-  /* FOOTER */
   footer: {
     marginTop: verticalScale(40),
     alignItems: "center",
