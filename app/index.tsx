@@ -39,7 +39,6 @@ export default function Home() {
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={[styles.content, isTablet && styles.tabletContent]}>
-
           {/* ===== HEADER ===== */}
           <View style={styles.header}>
             <Text style={styles.title}>Dev Streaks</Text>
@@ -49,21 +48,30 @@ export default function Home() {
                 onPress={() => router.push("/profile-share")}
                 style={styles.toolbarBtn}
               >
-                <Text style={[styles.toolbarIcon, { color: "#93c5fd" }]}>🔗</Text>
+                <Text style={[styles.toolbarIcon, { color: "#93c5fd" }]}>
+                  🔗
+                </Text>
               </Pressable>
 
               <Pressable
                 onPress={() => router.push("/stats")}
                 style={styles.toolbarBtn}
               >
-                <Text style={[styles.toolbarIcon, { color: "#facc15" }]}>📊</Text>
+                <Text style={[styles.toolbarIcon, { color: "#facc15" }]}>
+                  📊
+                </Text>
               </Pressable>
 
               <Pressable
                 onPress={() => router.push("/settings")}
                 style={styles.toolbarBtn}
               >
-                <Text style={[styles.toolbarIcon, { color: "#22c55e" }]}>⚙️</Text>
+                <Text style={[styles.toolbarIcon, { color: "#22c55e" }]}>
+                  ⚙️
+                </Text>
+              </Pressable>
+              <Pressable onPress={() => router.push("/repos")}>
+                <Text>📁</Text>
               </Pressable>
             </View>
           </View>
@@ -72,7 +80,6 @@ export default function Home() {
           <View
             style={[styles.cardsWrapper, isWide && styles.cardsWrapperWide]}
           >
-
             {/* ---------- GITHUB ---------- */}
             <View style={styles.card}>
               <StreakCard
@@ -96,9 +103,7 @@ export default function Home() {
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setGithubWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
                 >
                   {githubData.heatmap.length > 0 && githubWidth > 0 && (
                     <Heatmap
@@ -125,7 +130,9 @@ export default function Home() {
                     🏆 Longest: {leetcodeData.longestStreak} days
                   </Text>
                   <Text style={styles.metaText}>
-                    🟢 Easy: {leetcodeData.solved.easy}   🟡 Medium: {leetcodeData.solved.medium}   🔴 Hard: {leetcodeData.solved.hard}
+                    🟢 Easy: {leetcodeData.solved.easy} 🟡 Medium:{" "}
+                    {leetcodeData.solved.medium} 🔴 Hard:{" "}
+                    {leetcodeData.solved.hard}
                   </Text>
                 </View>
               )}
@@ -133,9 +140,7 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) =>
-                    setLeetcodeWidth(e.nativeEvent.layout.width)
-                  }
+                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
                 >
                   {leetcodeData.heatmap.length > 0 && leetcodeWidth > 0 && (
                     <Heatmap
@@ -150,11 +155,8 @@ export default function Home() {
 
           {/* ===== FOOTER ===== */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Made with ❤️ by Cosmo Coder
-            </Text>
+            <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
           </View>
-
         </View>
       </ScrollView>
     </LinearGradient>

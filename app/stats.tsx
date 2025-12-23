@@ -13,13 +13,16 @@ import { useGithubStreak } from "../hooks/useGithubStreak";
 import { useLeetCodeStreak } from "../hooks/useLeetCodeStreak";
 
 import StatCard from "../components/StatCard";
+import HealthScoreCard from "../components/HealthScoreCard";
+
 import {
   getWeeklySummary,
   getMonthlySummary,
   getComparison,
-  getHealthScore,
   getLastActiveDay,
 } from "../utils/stats";
+
+import { calculateHealthScore } from "../utils/healthScore";
 
 type Platform = "github" | "leetcode";
 
@@ -36,6 +39,7 @@ export default function Stats() {
   const data = isGithub ? githubData.heatmap : leetcodeData.heatmap;
   const accent = isGithub ? "#facc15" : "#f59e0b";
 
+  /* ===== DERIVED STATS ===== */
   const week = getWeeklySummary(data);
   const month = getMonthlySummary(data);
   const compare = getComparison(
@@ -43,13 +47,15 @@ export default function Stats() {
     data.slice(-14, -7)
   );
 
+  const health = calculateHealthScore(data);
+
   return (
     <LinearGradient
       colors={["#050505", "#0b1220", "#020617"]}
       style={styles.container}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* HEADER */}
+        {/* ===== HEADER ===== */}
         <View style={styles.header}>
           <Text style={styles.title}>Your Progress</Text>
           <Text style={styles.subtitle}>
@@ -57,7 +63,7 @@ export default function Stats() {
           </Text>
         </View>
 
-        {/* TOGGLE */}
+        {/* ===== PLATFORM TOGGLE ===== */}
         <View style={styles.toggleRow}>
           <Pressable onPress={() => setPlatform("github")}>
             <Text
@@ -98,12 +104,16 @@ export default function Stats() {
           </Pressable>
         </View>
 
-        {/* STREAKS */}
+        {/* ===== STREAKS ===== */}
         <Text style={styles.section}>Streaks</Text>
         <View style={styles.row}>
           <StatCard
             label="Current Streak"
-            value={`${isGithub ? githubData.currentStreak : leetcodeData.currentStreak} days`}
+            value={`${
+              isGithub
+                ? githubData.currentStreak
+                : leetcodeData.currentStreak
+            } days`}
             accent={accent}
           />
           <StatCard
@@ -112,13 +122,18 @@ export default function Stats() {
                 ? "Longest Commit Streak"
                 : "Longest Solving Streak"
             }
-            value={`${isGithub ? githubData.longestStreak : leetcodeData.longestStreak} days`}
+            value={`${
+              isGithub
+                ? githubData.longestStreak
+                : leetcodeData.longestStreak
+            } days`}
             accent={accent}
           />
         </View>
 
-        {/* TOTALS */}
+        {/* ===== TOTALS ===== */}
         <Text style={styles.section}>Totals</Text>
+
         {isGithub ? (
           <View style={styles.row}>
             <StatCard
@@ -156,7 +171,7 @@ export default function Stats() {
           </>
         )}
 
-        {/* WEEKLY */}
+        {/* ===== WEEKLY ===== */}
         <Text style={styles.section}>This Week</Text>
         <View style={styles.row}>
           <StatCard
@@ -171,7 +186,7 @@ export default function Stats() {
           />
         </View>
 
-        {/* MONTHLY */}
+        {/* ===== MONTHLY ===== */}
         <Text style={styles.section}>This Month</Text>
         <View style={styles.row}>
           <StatCard
@@ -186,7 +201,7 @@ export default function Stats() {
           />
         </View>
 
-        {/* HEALTH */}
+        {/* ===== CONSISTENCY ===== */}
         <Text style={styles.section}>Consistency</Text>
         <View style={styles.row}>
           <StatCard
@@ -195,20 +210,19 @@ export default function Stats() {
             accent={compare >= 0 ? "#22c55e" : "#ef4444"}
           />
           <StatCard
-            label="Health Score"
-            value={`${getHealthScore(data)}/100`}
-            accent="#22c55e"
-          />
-        </View>
-
-        {/* LAST ACTIVE */}
-        <View style={styles.row}>
-          <StatCard
             label="Last Active"
             value={getLastActiveDay(data)}
             accent={accent}
           />
         </View>
+
+        {/* ===== HEALTH SCORE (EXPLAINABLE) ===== */}
+        <Text style={styles.section}>Streak Health</Text>
+        <HealthScoreCard
+          score={health.score}
+          breakdown={health.breakdown}
+          explanation={health.explanation}
+        />
       </ScrollView>
     </LinearGradient>
   );
