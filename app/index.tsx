@@ -18,6 +18,9 @@ import StreakCard from "../components/StreakCard";
 
 import { moderateScale, verticalScale } from "../utils/responsive";
 
+
+
+
 export default function Home() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
