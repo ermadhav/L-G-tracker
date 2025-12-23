@@ -55,10 +55,8 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      // Permissions
       await Notifications.requestPermissionsAsync();
 
-      // Android channel (MANDATORY)
       if (Platform.OS === "android") {
         await Notifications.setNotificationChannelAsync("streaks", {
           name: "Streak Reminders",
@@ -67,7 +65,10 @@ export default function Home() {
         });
       }
 
-      // 🔔 REAL DAILY NOTIFICATIONS
+      // 🔥 IMPORTANT FIX
+      await cancelAllStreakNotifications();
+
+      // Schedule fresh ones
       await scheduleGithubNotifications();
       await scheduleLeetCodeNotifications();
     })();
