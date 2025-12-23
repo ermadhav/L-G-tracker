@@ -19,7 +19,13 @@ import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
 import { moderateScale, verticalScale } from "../utils/responsive";
 
-/* ================= ANDROID NOTIFICATION CONFIG ================= */
+import {
+  scheduleGithubNotifications,
+  scheduleLeetCodeNotifications,
+  cancelAllStreakNotifications,
+} from "../utils/scheduleNotifications";
+
+/* ================= NOTIFICATION HANDLER ================= */
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -43,14 +49,14 @@ export default function Home() {
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetCodeStreak(leetcode);
 
-  /* ================= NOTIFICATION TEST (WORKS 100%) ================= */
+  /* ================= NOTIFICATION SETUP ================= */
 
   useEffect(() => {
-    async function setupAndTestNotification() {
+    (async () => {
       // Permissions
       await Notifications.requestPermissionsAsync();
 
-      // ANDROID CHANNEL (MANDATORY)
+      // Android channel (MANDATORY)
       if (Platform.OS === "android") {
         await Notifications.setNotificationChannelAsync("streaks", {
           name: "Streak Reminders",
@@ -59,21 +65,29 @@ export default function Home() {
         });
       }
 
-      // 🔥 TEST NOTIFICATION (after 5 seconds)
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "🔥 Streak Tracker Test",
-          body: "If you see this, notifications are WORKING",
-        },
-        trigger: {
-          seconds: 5,
-          channelId: "streaks",
-        },
-      });
+      // 🔔 REAL DAILY NOTIFICATIONS
+      await scheduleGithubNotifications();
+      await scheduleLeetCodeNotifications();
+    })();
+  }, []);
+
+  /* ================= AUTO-CANCEL IF BOTH DONE ================= */
+
+  useEffect(() => {
+    if (
+      !githubData.heatmap?.length ||
+      !leetcodeData.heatmap?.length
+    ) {
+      return;
     }
 
-    setupAndTestNotification();
-  }, []);
+    const githubDone = githubData.heatmap.at(-1)! > 0;
+    const leetcodeDone = leetcodeData.heatmap.at(-1)! > 0;
+
+    if (githubDone && leetcodeDone) {
+      cancelAllStreakNotifications();
+    }
+  }, [githubData.heatmap, leetcodeData.heatmap]);
 
   /* ================= SAFE EARLY RETURN ================= */
 
