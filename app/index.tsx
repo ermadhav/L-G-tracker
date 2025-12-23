@@ -32,6 +32,12 @@ export default function Home() {
 
   if (!loaded) return null;
 
+  const totalSolved =
+    leetcodeData.solved.total ??
+    leetcodeData.solved.easy +
+      leetcodeData.solved.medium +
+      leetcodeData.solved.hard;
+
   return (
     <LinearGradient
       colors={["#050505", "#0b1220", "#020617"]}
@@ -70,6 +76,7 @@ export default function Home() {
                   ⚙️
                 </Text>
               </Pressable>
+
               <Pressable
                 onPress={() => router.push("/repos")}
                 style={styles.toolbarBtn}
@@ -93,7 +100,6 @@ export default function Home() {
                 loading={githubData.loading}
               />
 
-              {/* USER DETAILS */}
               {!githubData.loading && (
                 <View style={styles.metaRow}>
                   <Text style={styles.metaText}>
@@ -128,16 +134,20 @@ export default function Home() {
                 loading={leetcodeData.loading}
               />
 
-              {/* USER DETAILS */}
               {!leetcodeData.loading && (
                 <View style={styles.metaColumn}>
                   <Text style={styles.metaText}>
                     🏆 Longest: {leetcodeData.longestStreak} days
                   </Text>
+
                   <Text style={styles.metaText}>
-                    🟢 Easy: {leetcodeData.solved.easy} 🟡 Medium:{" "}
-                    {leetcodeData.solved.medium} 🔴 Hard:{" "}
+                    🟢 Easy: {leetcodeData.solved.easy}   🟡 Medium:{" "}
+                    {leetcodeData.solved.medium}   🔴 Hard:{" "}
                     {leetcodeData.solved.hard}
+                  </Text>
+
+                  <Text style={[styles.metaText, styles.totalSolved]}>
+                    🟰 Total Solved: {totalSolved}
                   </Text>
                 </View>
               )}
@@ -185,7 +195,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
-  /* HEADER */
   header: {
     marginBottom: verticalScale(24),
   },
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
   toolbar: {
     flexDirection: "row",
     gap: 12,
-    flexWrap: "wrap", // 🔥 future-proof
+    flexWrap: "wrap",
   },
 
   toolbarBtn: {
@@ -215,7 +224,6 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(18),
   },
 
-  /* CARDS */
   cardsWrapper: {
     gap: verticalScale(22),
   },
@@ -250,6 +258,12 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
   },
 
+  totalSolved: {
+    marginTop: 4,
+    fontWeight: "600",
+    color: "#e5e7eb",
+  },
+
   heatmapWrapper: {
     marginTop: verticalScale(14),
     padding: moderateScale(12),
@@ -258,7 +272,6 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
 
-  /* FOOTER */
   footer: {
     marginTop: verticalScale(40),
     alignItems: "center",
