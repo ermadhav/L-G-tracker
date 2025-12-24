@@ -49,17 +49,8 @@ Built with **Expo + React Native**, designed for **developers who care about con
 
 ## 📱 Screenshots
 
-> _(Add screenshots here once you upload them)_
 
 ```
-
-/screenshots
-├── home.png
-├── stats.png
-├── profile-share.png
-├── repos.png
-
-````
 
 ---
 
