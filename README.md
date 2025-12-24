@@ -1,9 +1,3 @@
-Awesome project 👏
-Here’s a **clean, professional, portfolio-ready GitHub README.md** you can directly copy-paste.
-It’s written to **stand out to recruiters**, explain features clearly, and show technical depth.
-
----
-
 ```md
 # 🔥 Dev Streaks Tracker
 
