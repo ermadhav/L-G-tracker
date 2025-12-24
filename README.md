@@ -177,7 +177,3 @@ If you like this project:
 * 🍴 Fork it
 * 🐛 Report issues
 * 💡 Suggest features
-
-Consistency is a superpower 🚀
-
-```
