@@ -102,8 +102,8 @@ utils/
 ### 1️⃣ Clone the repo
 
 ```bash
-git clone https://github.com/your-username/dev-streaks-tracker.git
-cd dev-streaks-tracker
+git clone https://github.com/ermadhav/L-G-tracker
+cd L-G-tracker
 ```
 
 ### 2️⃣ Install dependencies
