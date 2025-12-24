@@ -1,50 +1,216 @@
-# Welcome to your Expo app 👋
+Awesome project 👏
+Here’s a **clean, professional, portfolio-ready GitHub README.md** you can directly copy-paste.
+It’s written to **stand out to recruiters**, explain features clearly, and show technical depth.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+---
 
-## Get started
+```md
+# 🔥 Dev Streaks Tracker
 
-1. Install dependencies
+Track your **GitHub commits** and **LeetCode problem-solving streaks** in one beautiful mobile app.  
+Built with **Expo + React Native**, designed for **developers who care about consistency**.
 
-   ```bash
-   npm install
-   ```
+> _“Consistency beats intensity.”_
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## ✨ Features
 
-In the output, you'll find options to open the app in a
+### 🧩 GitHub
+- ✅ Current commit streak
+- 🏆 Longest commit streak
+- 📦 Total commits
+- 📊 Contribution heatmap (last 90 days)
+- 🔔 Smart streak reminder notifications
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 🧠 LeetCode
+- ✅ Current solving streak
+- 🏆 Longest solving streak
+- 🟢 Easy / 🟡 Medium / 🔴 Hard solved count
+- 🟰 Total problems solved
+- 📊 Submission heatmap (last 90 days)
+- ⏰ IST-based reminders (5:30 AM reset)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 📈 Stats Dashboard
+- Weekly & monthly activity summaries
+- Active days vs total days
+- Streak health score (0–100)
+- Last active day
+- Platform comparison (GitHub vs LeetCode)
 
-## Get a fresh project
+### 🔗 Profile Sharing
+- Auto-generated QR codes for:
+  - GitHub profile
+  - LeetCode profile
+- One-tap profile links
+- Share your coding journey instantly
 
-When you're ready, run:
+### 🔔 Smart Notifications
+- ⏳ 5 hours before day ends
+- ⚠️ 1 hour before day ends
+- Auto-cancels if streak is already saved
+- Android-optimized notification channels
 
-```bash
-npm run reset-project
+---
+
+## 📱 Screenshots
+
+> _(Add screenshots here once you upload them)_
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+/screenshots
+├── home.png
+├── stats.png
+├── profile-share.png
+├── repos.png
 
-## Learn more
+````
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 🛠 Tech Stack
 
-## Join the community
+- **React Native**
+- **Expo (Dev Client)**
+- **TypeScript**
+- **expo-router**
+- **expo-notifications**
+- **GitHub GraphQL API**
+- **LeetCode GraphQL API**
+- **react-native-svg**
+- **Linear Gradients & Custom UI**
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🧠 Architecture
+
+```txt
+app/
+ ├── index.tsx            # Home screen
+ ├── stats.tsx            # Stats dashboard
+ ├── profile-share.tsx    # QR & sharing screen
+ ├── repos.tsx            # Starred / popular repos
+ ├── settings.tsx
+
+hooks/
+ ├── useGithubStreak.ts
+ ├── useLeetCodeStreak.ts
+ ├── useUsernames.ts
+
+components/
+ ├── Heatmap.tsx
+ ├── StreakCard.tsx
+ ├── StatCard.tsx
+
+utils/
+ ├── notifications.ts
+ ├── scheduleNotifications.ts
+ ├── stats.ts
+ ├── healthScore.ts
+````
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repo
+
+```bash
+git clone https://github.com/your-username/dev-streaks-tracker.git
+cd dev-streaks-tracker
+```
+
+### 2️⃣ Install dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Environment variables
+
+Create a `.env` file:
+
+```env
+EXPO_PUBLIC_GITHUB_TOKEN=your_github_token
+EXPO_PUBLIC_LEETCODE_USERNAME=your_leetcode_username
+```
+
+### 4️⃣ Run on real device (required for notifications)
+
+```bash
+npx expo run:android
+```
+
+> ⚠️ Notifications **do not work in Expo Go**
+> Use **Expo Dev Client** or a real device.
+
+---
+
+## 🔔 Notification Logic
+
+| Platform | Timezone | Reminder Times         |
+| -------- | -------- | ---------------------- |
+| GitHub   | Local    | 5h & 1h before day end |
+| LeetCode | IST      | 5h & 1h before 5:30 AM |
+
+✔ Auto-cancelled if streak already completed
+✔ Prevents duplicate notifications on reload
+
+---
+
+## 🌟 Why This App Stands Out
+
+* Not just streaks → **behavior-driven insights**
+* Time-zone-aware reminders
+* GitHub + LeetCode in **one unified UX**
+* Built with **scalable architecture**
+* Resume-worthy real-world project
+
+---
+
+## 🧑‍💻 Author
+
+**Cosmo Coder**
+Engineering Student & Mobile App Developer
+
+> Built with ❤️ to stay consistent every single day.
+
+---
+
+## 📄 License
+
+MIT License — feel free to fork, improve, and build on it.
+
+---
+
+## ⭐ Support
+
+If you like this project:
+
+* ⭐ Star the repo
+* 🍴 Fork it
+* 🐛 Report issues
+* 💡 Suggest features
+
+Consistency is a superpower 🚀
+
+```
+
+---
+
+## ✅ What you should do next
+
+1. Paste this into `README.md`
+2. Add screenshots
+3. Push to GitHub
+4. Pin the repo to your profile
+
+If you want, I can also:
+- Write **resume bullet points**
+- Create **Play Store description**
+- Improve README with **badges**
+- Optimize for **open-source visibility**
+
+Just say the word 🔥
+```
