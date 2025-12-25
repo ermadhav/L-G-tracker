@@ -1,4 +1,4 @@
-package com.cosmocoder.streaktracker
+package com.cosmocoder.devstreaks
 
 import android.app.Application
 import android.content.res.Configuration
