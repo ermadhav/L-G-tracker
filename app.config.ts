@@ -7,21 +7,29 @@ export default {
     scheme: "streaktracker",
     userInterfaceStyle: "automatic",
 
-    // ✅ APP ICON
-    icon: "./assets/icon.png",
+    // ✅ MAIN APP ICON
+    icon: "./assets/images/icon.png",
 
-    // ✅ ANDROID CONFIG (REQUIRED)
+    // ✅ SPLASH (optional but safe)
+    splash: {
+      image: "./assets/images/splash-icon.png",
+      resizeMode: "contain",
+      backgroundColor: "#020617",
+    },
+
     android: {
-      package: "com.cosmocoder.streaktracker",
+      package: "com.cosmocoder.devstreaks",
+
+      // ✅ ANDROID ADAPTIVE ICON
       adaptiveIcon: {
-        foregroundImage: "./assets/icon.png",
-        backgroundColor: "#020617",
+        foregroundImage: "./assets/images/android-icon-foreground.png",
+        backgroundImage: "./assets/images/android-icon-background.png",
       },
     },
 
     // ✅ NOTIFICATION ICON
     notification: {
-      icon: "./assets/notification-icon.png",
+      icon: "./assets/images/notification-icon.png",
       color: "#22c55e",
     },
 
