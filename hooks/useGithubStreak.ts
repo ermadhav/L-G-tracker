@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
 
-const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN!;
+/**
+ * IMPORTANT:
+ * Make sure this env variable exists and is correct
+ * EXPO_PUBLIC_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxx
+ */
+const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN ?? "";
 
 export function useGithubStreak(username: string) {
+  const cleanUsername = username?.trim(); // 🔥 FIX: remove spaces
+
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
   const [totalCommits, setTotalCommits] = useState(0);
   const [heatmap, setHeatmap] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // ✅ NEW
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!username) {
+    if (!cleanUsername) {
       setLoading(false);
       return;
     }
@@ -20,6 +27,9 @@ export function useGithubStreak(username: string) {
       try {
         setLoading(true);
         setError(null);
+
+        // 🧪 Debug (remove later)
+        // console.log("Fetching GitHub data for:", cleanUsername);
 
         const res = await fetch("https://api.github.com/graphql", {
           method: "POST",
@@ -44,30 +54,30 @@ export function useGithubStreak(username: string) {
                 }
               }
             `,
-            variables: { username },
+            variables: { username: cleanUsername },
           }),
         });
 
         const json = await res.json();
 
-        /* ---------- 🔒 HARD SAFETY CHECK ---------- */
+        /* ---------- SAFETY CHECK ---------- */
         if (!json?.data?.user) {
-          throw new Error("GitHub user not found or token invalid");
+          throw new Error(
+            json?.errors?.[0]?.message ??
+              "GitHub user not found or token invalid"
+          );
         }
 
         const weeks =
-          json.data.user.contributionsCollection
-            ?.contributionCalendar?.weeks;
+          json.data.user.contributionsCollection?.contributionCalendar?.weeks;
 
-        if (!weeks) {
-          throw new Error("No contribution data available");
+        if (!weeks || weeks.length === 0) {
+          throw new Error("No contribution data found");
         }
 
-        const days = weeks.flatMap(
-          (w: any) => w.contributionDays
-        );
+        const days = weeks.flatMap((w: any) => w.contributionDays);
 
-        /* ---------- MAP ---------- */
+        /* ---------- MAP DATE → COUNT ---------- */
         const map = new Map<string, number>();
         days.forEach((d: any) => {
           map.set(d.date, d.contributionCount);
@@ -109,7 +119,7 @@ export function useGithubStreak(username: string) {
 
         setLongestStreak(longest);
 
-        /* ---------- HEATMAP ---------- */
+        /* ---------- HEATMAP (LAST 90 DAYS) ---------- */
         const heat: number[] = [];
         const today = new Date();
 
@@ -124,7 +134,6 @@ export function useGithubStreak(username: string) {
       } catch (err: any) {
         console.error("GitHub streak error:", err.message);
 
-        // ✅ RESET SAFELY
         setCurrentStreak(0);
         setLongestStreak(0);
         setTotalCommits(0);
@@ -136,7 +145,7 @@ export function useGithubStreak(username: string) {
     }
 
     fetchData();
-  }, [username]);
+  }, [cleanUsername]);
 
   return {
     currentStreak,
@@ -144,6 +153,6 @@ export function useGithubStreak(username: string) {
     totalCommits,
     heatmap,
     loading,
-    error, // 👈 optional, can be shown in UI
+    error,
   };
 }
