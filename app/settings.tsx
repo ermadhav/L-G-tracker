@@ -1,18 +1,11 @@
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useUsernames } from "../hooks/useUsernames";
 import { moderateScale, verticalScale } from "../utils/responsive";
 
 export default function Settings() {
-  const { github, leetcode, setGithub, setLeetcode, save } =
-    useUsernames();
+  const { github, leetcode, setGithub, setLeetcode, save } = useUsernames();
 
   return (
     <LinearGradient
@@ -21,9 +14,7 @@ export default function Settings() {
     >
       {/* Header */}
       <Text style={styles.title}>Settings</Text>
-      <Text style={styles.subtitle}>
-        Configure your developer profiles
-      </Text>
+      <Text style={styles.subtitle}>Configure your developer profiles</Text>
 
       {/* GitHub */}
       <View style={styles.inputGroup}>
@@ -31,7 +22,7 @@ export default function Settings() {
         <TextInput
           value={github}
           onChangeText={setGithub}
-          placeholder="e.g. torvalds"
+          placeholder="e.g. ermadhav"
           placeholderTextColor="#6b7280"
           style={styles.input}
           autoCapitalize="none"
@@ -44,7 +35,7 @@ export default function Settings() {
         <TextInput
           value={leetcode}
           onChangeText={setLeetcode}
-          placeholder="e.g. cosmocoder"
+          placeholder="e.g. cosmocoders"
           placeholderTextColor="#6b7280"
           style={styles.input}
           autoCapitalize="none"
@@ -65,13 +56,12 @@ export default function Settings() {
         <Text style={styles.buttonText}>Save Changes</Text>
       </Pressable>
       {/* ===== FOOTER ===== */}
-                <View style={styles.footer}>
-                  <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
-                </View>
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+      </View>
     </LinearGradient>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -132,12 +122,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   footer: {
-      marginTop: verticalScale(40),
-      alignItems: "center",
-    },
-  
-    footerText: {
-      fontSize: 12,
-      color: "#6b7280",
-    },
+    marginTop: verticalScale(40),
+    alignItems: "center",
+  },
+
+  footerText: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
 });
