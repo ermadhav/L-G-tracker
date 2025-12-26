@@ -1,4 +1,4 @@
-package com.cosmocoder.streaktracker
+package com.cosmocoder.devstreaks
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
