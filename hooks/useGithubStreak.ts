@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 
 /**
- * IMPORTANT:
- * Make sure this env variable exists and is correct
- * EXPO_PUBLIC_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxx
+ * ENV REQUIRED:
+ * EXPO_PUBLIC_GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
  */
 const GITHUB_TOKEN = process.env.EXPO_PUBLIC_GITHUB_TOKEN ?? "";
 
+type ContributionDay = {
+  date: string;
+  contributionCount: number;
+};
+
 export function useGithubStreak(username: string) {
-  const cleanUsername = username?.trim(); // 🔥 FIX: remove spaces
+  const cleanUsername = username?.trim();
 
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
@@ -23,19 +27,26 @@ export function useGithubStreak(username: string) {
       return;
     }
 
+    // ❌ HARD FAIL if token missing
+    if (!GITHUB_TOKEN) {
+      setError(
+        "GitHub token missing. Check EXPO_PUBLIC_GITHUB_TOKEN in .env"
+      );
+      setLoading(false);
+      return;
+    }
+
     async function fetchData() {
       try {
         setLoading(true);
         setError(null);
-
-        // 🧪 Debug (remove later)
-        // console.log("Fetching GitHub data for:", cleanUsername);
 
         const res = await fetch("https://api.github.com/graphql", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${GITHUB_TOKEN}`,
             "Content-Type": "application/json",
+            Accept: "application/vnd.github+json",
           },
           body: JSON.stringify({
             query: `
@@ -60,12 +71,14 @@ export function useGithubStreak(username: string) {
 
         const json = await res.json();
 
-        /* ---------- SAFETY CHECK ---------- */
+        /* ---------- GRAPHQL ERROR VISIBILITY ---------- */
+        if (json.errors?.length) {
+          console.error("GitHub GraphQL errors:", json.errors);
+          throw new Error(json.errors[0].message);
+        }
+
         if (!json?.data?.user) {
-          throw new Error(
-            json?.errors?.[0]?.message ??
-              "GitHub user not found or token invalid"
-          );
+          throw new Error("GitHub user not found or token invalid");
         }
 
         const weeks =
@@ -75,31 +88,36 @@ export function useGithubStreak(username: string) {
           throw new Error("No contribution data found");
         }
 
-        const days = weeks.flatMap((w: any) => w.contributionDays);
+        const days: ContributionDay[] = weeks.flatMap(
+          (w: any) => w.contributionDays
+        );
 
         /* ---------- MAP DATE → COUNT ---------- */
         const map = new Map<string, number>();
-        days.forEach((d: any) => {
+        days.forEach((d) => {
           map.set(d.date, d.contributionCount);
         });
 
         /* ---------- TOTAL COMMITS ---------- */
         const total = days.reduce(
-          (sum: number, d: any) => sum + d.contributionCount,
+          (sum, d) => sum + d.contributionCount,
           0
         );
         setTotalCommits(total);
 
-        /* ---------- CURRENT STREAK ---------- */
+        /* ---------- CURRENT STREAK (UTC SAFE) ---------- */
         let streak = 0;
-        let cursor = new Date();
+        const cursor = new Date();
+        cursor.setUTCHours(0, 0, 0, 0);
 
         while (true) {
           const key = cursor.toISOString().slice(0, 10);
           if ((map.get(key) || 0) > 0) {
             streak++;
             cursor.setUTCDate(cursor.getUTCDate() - 1);
-          } else break;
+          } else {
+            break;
+          }
         }
 
         setCurrentStreak(streak);
@@ -108,7 +126,7 @@ export function useGithubStreak(username: string) {
         let longest = 0;
         let current = 0;
 
-        days.forEach((d: any) => {
+        days.forEach((d) => {
           if (d.contributionCount > 0) {
             current++;
             longest = Math.max(longest, current);
@@ -122,6 +140,7 @@ export function useGithubStreak(username: string) {
         /* ---------- HEATMAP (LAST 90 DAYS) ---------- */
         const heat: number[] = [];
         const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
 
         for (let i = 89; i >= 0; i--) {
           const d = new Date(today);

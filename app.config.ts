@@ -28,10 +28,6 @@ export default {
     },
 
     // ✅ NOTIFICATION ICON
-    notification: {
-      icon: "./assets/images/notification-icon.png",
-      color: "#22c55e",
-    },
 
     plugins: ["expo-router"],
 

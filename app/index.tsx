@@ -8,9 +8,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect } from "react";
-import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { useState } from "react";
 
 import { useUsernames } from "../hooks/useUsernames";
 import { useGithubStreak } from "../hooks/useGithubStreak";
@@ -19,26 +17,8 @@ import { Heatmap } from "../components/Heatmap";
 import StreakCard from "../components/StreakCard";
 import { moderateScale, verticalScale } from "../utils/responsive";
 
-import {
-  scheduleGithubNotifications,
-  scheduleLeetCodeNotifications,
-  cancelAllStreakNotifications,
-} from "../utils/scheduleNotifications";
-
-/* ================= NOTIFICATION HANDLER ================= */
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
 export default function Home() {
-  /* ================= HOOKS (ORDER NEVER CHANGES) ================= */
+  /* ================= HOOKS ================= */
 
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
@@ -50,44 +30,6 @@ export default function Home() {
   const { github, leetcode, loaded } = useUsernames();
   const githubData = useGithubStreak(github);
   const leetcodeData = useLeetCodeStreak(leetcode);
-
-  /* ================= NOTIFICATION SETUP ================= */
-
-  useEffect(() => {
-    (async () => {
-      await Notifications.requestPermissionsAsync();
-
-      if (Platform.OS === "android") {
-        await Notifications.setNotificationChannelAsync("streaks", {
-          name: "Streak Reminders",
-          importance: Notifications.AndroidImportance.MAX,
-          sound: "default",
-        });
-      }
-
-      // 🔥 IMPORTANT FIX
-      await cancelAllStreakNotifications();
-
-      // Schedule fresh ones
-      await scheduleGithubNotifications();
-      await scheduleLeetCodeNotifications();
-    })();
-  }, []);
-
-  /* ================= AUTO-CANCEL IF BOTH DONE ================= */
-
-  useEffect(() => {
-    if (!githubData.heatmap?.length || !leetcodeData.heatmap?.length) {
-      return;
-    }
-
-    const githubDone = githubData.heatmap.at(-1)! > 0;
-    const leetcodeDone = leetcodeData.heatmap.at(-1)! > 0;
-
-    if (githubDone && leetcodeDone) {
-      cancelAllStreakNotifications();
-    }
-  }, [githubData.heatmap, leetcodeData.heatmap]);
 
   /* ================= SAFE EARLY RETURN ================= */
 
@@ -171,7 +113,9 @@ export default function Home() {
               {!githubData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setGithubWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setGithubWidth(e.nativeEvent.layout.width)
+                  }
                 >
                   {githubData.heatmap.length > 0 && githubWidth > 0 && (
                     <Heatmap
@@ -210,7 +154,9 @@ export default function Home() {
               {!leetcodeData.loading && (
                 <View
                   style={styles.heatmapWrapper}
-                  onLayout={(e) => setLeetcodeWidth(e.nativeEvent.layout.width)}
+                  onLayout={(e) =>
+                    setLeetcodeWidth(e.nativeEvent.layout.width)
+                  }
                 >
                   {leetcodeData.heatmap.length > 0 && leetcodeWidth > 0 && (
                     <Heatmap
@@ -225,7 +171,9 @@ export default function Home() {
 
           {/* ===== FOOTER ===== */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Made with ❤️ by Cosmo Coder</Text>
+            <Text style={styles.footerText}>
+              Made with ❤️ by Cosmo Coder
+            </Text>
           </View>
         </View>
       </ScrollView>
